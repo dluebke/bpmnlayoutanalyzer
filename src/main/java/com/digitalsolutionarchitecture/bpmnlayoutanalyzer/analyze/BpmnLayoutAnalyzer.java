@@ -22,14 +22,20 @@ import org.w3c.dom.Element;
 import org.w3c.dom.NodeList;
 import org.xml.sax.SAXException;
 
-import com.digitalsolutionarchitecture.bpmnlayoutanalyzer.bpmnmodel.BPMNNamespaceContext;
+import com.digitalsolutionarchitecture.bpmnlayoutanalyzer.analyze.edges.EdgeDirection;
+import com.digitalsolutionarchitecture.bpmnlayoutanalyzer.analyze.edges.EdgeDirectionEvaluator;
+import com.digitalsolutionarchitecture.bpmnlayoutanalyzer.analyze.edges.EdgeWaypointOptimizer;
+import com.digitalsolutionarchitecture.bpmnlayoutanalyzer.analyze.exporter.ExporterEstimator;
+import com.digitalsolutionarchitecture.bpmnlayoutanalyzer.analyze.exporter.ExporterInfo;
 import com.digitalsolutionarchitecture.bpmnlayoutanalyzer.bpmnmodel.WayPoint;
+import com.digitalsolutionarchitecture.bpmnlayoutanalyzer.bpmnxml.BPMNNamespaceContext;
+import com.digitalsolutionarchitecture.bpmnlayoutanalyzer.bpmnxml.XMLReaderHelper;
 
 public class BpmnLayoutAnalyzer {
 
 	private ExporterEstimator toolEstimator = new ExporterEstimator();
-	
-	private static final int DEGREE_TOLERANCE = 2;
+	private EdgeDirectionEvaluator edgeDirectionEvaluator = new EdgeDirectionEvaluator();
+	private EdgeWaypointOptimizer edgeWaypointOptimizer = new EdgeWaypointOptimizer();
 	
 	public List<Result> analyze(File bpmnModelFile) throws SAXException, IOException, ParserConfigurationException, XPathExpressionException {
 		List<Result> results = new ArrayList<>();
@@ -69,9 +75,9 @@ public class BpmnLayoutAnalyzer {
 					Element edge = (Element)edges.item(j);
 					if(idsOfSequenceFlows.contains(edge.getAttribute("bpmnElement"))) {
 						NodeList waypointsNodeList = edge.getElementsByTagNameNS(bpmnNamespaceContext.getNamespaceURI("di"), "waypoint");
-						List<WayPoint> waypoints = convertToWayPoints(waypointsNodeList);
-						boolean optimized = optimize(waypoints);
-						EdgeDirection at = evaluateArcType(waypoints);
+						List<WayPoint> waypoints = XMLReaderHelper.convertToWayPoints(waypointsNodeList);
+						boolean optimized = edgeWaypointOptimizer.optimize(waypoints);
+						EdgeDirection at = edgeDirectionEvaluator.evaluateArcType(waypoints);
 						result.addSequenceFlow(at);
 						if(optimized) {
 							result.addOptimizableSequenceFlow(at);
@@ -86,80 +92,7 @@ public class BpmnLayoutAnalyzer {
 		return results;
 	}
 
-	static boolean optimize(List<WayPoint> waypoints) {
-		Set<WayPoint> toRemove = new HashSet<>();
-		
-		for(int i = 0; i < waypoints.size() - 2; i++) {
-			WayPoint wp1 = waypoints.get(i);
-			WayPoint wp2 = waypoints.get(i + 1);
-			WayPoint wp3 = waypoints.get(i + 2);
-			
-			if(calDegree(wp1, wp2) == calDegree(wp2, wp3)) {
-				toRemove.add(wp2);
-			}
-		}
-		
-		waypoints.removeAll(toRemove);
-		return toRemove.size() > 0;
-	}
 	
-	private List<WayPoint> convertToWayPoints(NodeList waypointsNodeList) {
-		List<WayPoint> result = new ArrayList<>();
-		for(int i = 0; i < waypointsNodeList.getLength(); i++) {
-			result.add(WayPoint.fromDiElement(waypointsNodeList.item(i)));
-		}
-		return result;
-	}
-
-	private EdgeDirection evaluateArcType(List<WayPoint> waypoints) {
-		WayPoint wp1 = waypoints.get(0);
-		WayPoint wpLast = waypoints.get(waypoints.size() - 1);
-		
-		String direction;
-		int degree = calDegree(wp1, wpLast);
-		if(degree < DEGREE_TOLERANCE) {
-			direction = "LEFT_RIGHT";
-		} else if(degree < 90 - DEGREE_TOLERANCE) {
-			direction = "LEFT_LOWERRIGHT";
-		} else if(degree < 90 + DEGREE_TOLERANCE) {
-			direction = "TOP_BOTTOM";
-		} else if(degree < 180 - DEGREE_TOLERANCE) {
-			direction = "RIGHT_LOWERLEFT";
-		} else if(degree < 180 + DEGREE_TOLERANCE) {
-			direction = "RIGHT_LEFT";
-		} else if(degree < 270 - DEGREE_TOLERANCE) {
-			direction = "RIGHT_UPPERLEFT";
-		} else if(degree < 270 + DEGREE_TOLERANCE) {
-			direction = "BOTTOM_TOP";
-		} else {
-			direction = "LEFT_UPPERRIGHT";
-		}
-		
-		if(waypoints.size() == 2) {
-			return EdgeDirection.valueOf("DIRECT_" + direction);
-		} else if(waypoints.size() == 3) {
-			WayPoint wp2 = waypoints.get(1);
-			if(wp1.getX() == wp2.getX() && wp2.getY() == wpLast.getY()) {
-				return EdgeDirection.valueOf("PERPENDICULAR_" + direction);
-			} else if(wp1.getY() == wp2.getY() && wp2.getX() == wpLast.getX()) {
-				return EdgeDirection.valueOf("PERPENDICULAR_" + direction);
-			} else {
-				return EdgeDirection.valueOf("BEND_" + direction);
-			}
-		} else if(waypoints.size() == 4) {
-			WayPoint wp2 = waypoints.get(1);
-			WayPoint wp3 = waypoints.get(2);
-			if(wp1.getX() == wp2.getX() && wp2.getY() == wp3.getY() && wp3.getX() == wpLast.getX()) {
-				return EdgeDirection.valueOf("ZAGGED_" + direction);
-			} else if(wp1.getY() == wp2.getY() && wp2.getX() == wp3.getX() && wp3.getY() == wpLast.getY()) {
-				return EdgeDirection.valueOf("ZAGGED_" + direction);
-			} else {
-				return EdgeDirection.valueOf("BEND_" + direction);
-			}
-		} else {
-			return EdgeDirection.valueOf("BEND_" + direction);
-		}
-	}
 	
 	static int calDegree(WayPoint wp1, WayPoint wpLast) {
 		double x0 = wp1.getX();

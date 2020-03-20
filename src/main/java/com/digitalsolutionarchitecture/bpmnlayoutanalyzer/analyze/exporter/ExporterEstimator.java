@@ -1,4 +1,4 @@
-package com.digitalsolutionarchitecture.bpmnlayoutanalyzer.analyze;
+package com.digitalsolutionarchitecture.bpmnlayoutanalyzer.analyze.exporter;
 
 import java.util.HashMap;
 import java.util.List;

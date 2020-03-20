@@ -1,4 +1,4 @@
-package com.digitalsolutionarchitecture.bpmnlayoutanalyzer.analyze;
+package com.digitalsolutionarchitecture.bpmnlayoutanalyzer.analyze.edges;
 
 public enum EdgeDirection {
 	

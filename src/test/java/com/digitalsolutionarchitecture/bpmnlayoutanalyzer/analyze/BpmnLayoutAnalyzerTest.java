@@ -1,11 +1,10 @@
 package com.digitalsolutionarchitecture.bpmnlayoutanalyzer.analyze;
 
-import static org.junit.Assert.*;
+import static org.junit.Assert.assertEquals;
+import static org.junit.Assert.assertSame;
 
 import java.io.File;
 import java.io.IOException;
-import java.util.ArrayList;
-import java.util.Arrays;
 import java.util.List;
 
 import javax.xml.parsers.ParserConfigurationException;
@@ -14,9 +13,7 @@ import javax.xml.xpath.XPathExpressionException;
 import org.junit.Test;
 import org.xml.sax.SAXException;
 
-import com.digitalsolutionarchitecture.bpmnlayoutanalyzer.analyze.EdgeDirection;
-import com.digitalsolutionarchitecture.bpmnlayoutanalyzer.analyze.BpmnLayoutAnalyzer;
-import com.digitalsolutionarchitecture.bpmnlayoutanalyzer.analyze.Result;
+import com.digitalsolutionarchitecture.bpmnlayoutanalyzer.analyze.edges.EdgeDirection;
 import com.digitalsolutionarchitecture.bpmnlayoutanalyzer.bpmnmodel.WayPoint;
 
 public class BpmnLayoutAnalyzerTest {
@@ -76,6 +73,7 @@ public class BpmnLayoutAnalyzerTest {
 		
 		assertEquals(1, results.size());
 		Result result = results.get(0);
+		System.out.println(result.getSequenceFlowDirections());
 		assertEquals("Camunda Modeler", result.getExporter());
 		assertEquals("3.1.2", result.getExporterVersion());
 		assertEquals(2, result.getSequenceFlowDirections().get(EdgeDirection.ZAGGED_LEFT_UPPERRIGHT));
@@ -91,7 +89,6 @@ public class BpmnLayoutAnalyzerTest {
 		
 		assertEquals(1, results.size());
 		Result result = results.get(0);
-		System.out.println(result.getSequenceFlowDirections());
 		assertEquals("Camunda Modeler", result.getExporter());
 		assertEquals("3.1.2", result.getExporterVersion());
 		assertEquals(1, result.getSequenceFlowDirections().get(EdgeDirection.ZAGGED_LEFT_UPPERRIGHT));
@@ -100,32 +97,5 @@ public class BpmnLayoutAnalyzerTest {
 		
 		assertSame(EdgeDirection.DIRECT_LEFT_RIGHT, result.getDominantSequenceFlowDirection());
 		assertEquals(1.0, result.getDominantSequenceFlowDirectionPurity(), 0.0001);
-	}
-	
-	@Test
-	public void test_OptimizeWayPoints_Optimizable() throws Exception {
-		WayPoint p1 = new WayPoint(1.0, 1.0);
-		WayPoint p2 = new WayPoint(2.0, 2.0);
-		WayPoint p3 = new WayPoint(3.0, 3.0);
-		
-		List<WayPoint> optimizableList = new ArrayList<>(Arrays.asList(p1, p2, p3));
-		assertTrue(BpmnLayoutAnalyzer.optimize(optimizableList));
-		assertEquals(2, optimizableList.size());
-		assertSame(p1, optimizableList.get(0));
-		assertSame(p3, optimizableList.get(1));
-	}
-	
-	@Test
-	public void test_OptimizeWayPoints_NotOptimizable() throws Exception {
-		WayPoint p1 = new WayPoint(1.0, 1.0);
-		WayPoint p2 = new WayPoint(2.0, 2.0);
-		WayPoint p3 = new WayPoint(1.0, 0.5);
-		
-		List<WayPoint> optimizableList = new ArrayList<>(Arrays.asList(p1, p2, p3));
-		assertFalse(BpmnLayoutAnalyzer.optimize(optimizableList));
-		assertEquals(3, optimizableList.size());
-		assertSame(p1, optimizableList.get(0));
-		assertSame(p2, optimizableList.get(1));
-		assertSame(p3, optimizableList.get(2));
 	}
 }

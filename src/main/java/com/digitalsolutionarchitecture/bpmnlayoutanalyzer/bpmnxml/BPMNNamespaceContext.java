@@ -1,4 +1,4 @@
-package com.digitalsolutionarchitecture.bpmnlayoutanalyzer.bpmnmodel;
+package com.digitalsolutionarchitecture.bpmnlayoutanalyzer.bpmnxml;
 
 import java.util.HashMap;
 import java.util.Iterator;

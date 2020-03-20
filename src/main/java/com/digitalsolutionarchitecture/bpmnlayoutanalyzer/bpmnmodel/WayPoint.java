@@ -1,8 +1,5 @@
 package com.digitalsolutionarchitecture.bpmnlayoutanalyzer.bpmnmodel;
 
-import org.w3c.dom.NamedNodeMap;
-import org.w3c.dom.Node;
-
 public class WayPoint {
 
 	private double x;
@@ -30,17 +27,6 @@ public class WayPoint {
 
 	public void setY(double y) {
 		this.y = y;
-	}
-
-	public static WayPoint fromDiElement(Node item) {
-		WayPoint wp = new WayPoint();
-		
-		NamedNodeMap attributes = item.getAttributes();
-		
-		wp.setX(Double.parseDouble(attributes.getNamedItem("x").getNodeValue()));
-		wp.setY(Double.parseDouble(attributes.getNamedItem("y").getNodeValue()));
-		
-		return wp;
 	}
 
 	@Override

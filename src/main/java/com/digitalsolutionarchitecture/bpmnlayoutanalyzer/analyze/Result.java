@@ -4,6 +4,7 @@ import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.List;
 
+import com.digitalsolutionarchitecture.bpmnlayoutanalyzer.analyze.edges.EdgeDirection;
 import com.digitalsolutionarchitecture.bpmnlayoutanalyzer.util.CounterMap;
 
 public class Result {
