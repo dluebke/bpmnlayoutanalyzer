@@ -35,6 +35,11 @@ public class CsvResultOutput {
 			headers.add("OPTIMIZABLE_SEQUENCEFLOW_" + at.toString());
 		}
 		headers.add("OPTIMIZABLE_SEQUENCEFLOW_TOTAL");
+		headers.add("DIAGRAM_X");
+		headers.add("DIAGRAM_Y");
+		headers.add("DIAGRAM_WIDTH");
+		headers.add("DIAGRAM_HEIGHT");
+		headers.add("DIAGRAM_AREA");
 		
 		HEADERS = headers.toArray(new String[headers.size()]);
 	}
@@ -62,6 +67,13 @@ public class CsvResultOutput {
 				fields.add(Integer.toString(r.getOptimizableSequenceFlowDirections().get(at)));
 			}
 			fields.add(Integer.toString(r.getOptimizableSequenceFlowDirections().sumAll()));
+			
+			fields.add(Double.toString(r.getDiagramBounds().getX()));
+			fields.add(Double.toString(r.getDiagramBounds().getY()));
+			fields.add(Double.toString(r.getDiagramBounds().getWidth()));
+			fields.add(Double.toString(r.getDiagramBounds().getHeight()));
+			fields.add(Double.toString(r.getDiagramBounds().getArea()));
+			
 			writeLine(out, fields.toArray(new String[fields.size()]));
 			fields.clear();
 		}

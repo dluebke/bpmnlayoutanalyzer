@@ -5,6 +5,7 @@ import java.util.Arrays;
 import java.util.List;
 
 import com.digitalsolutionarchitecture.bpmnlayoutanalyzer.analyze.edges.EdgeDirection;
+import com.digitalsolutionarchitecture.bpmnlayoutanalyzer.bpmnmodel.Bounds;
 import com.digitalsolutionarchitecture.bpmnlayoutanalyzer.util.CounterMap;
 
 public class Result {
@@ -17,6 +18,7 @@ public class Result {
 	private double dominantSequenceFlowDirectionPurity;
 	private String name;
 	private int diagramNo;
+	private Bounds diagramBounds;
 	
 	public Result(String name, int diagramNo, String exporter, String exporterVersion) {
 		this.name = name;
@@ -97,5 +99,13 @@ public class Result {
 	
 	public CounterMap<EdgeDirection> getOptimizableSequenceFlowDirections() {
 		return optimizableSequenceFlowTypes;
+	}
+
+	public void setDiagramBounds(Bounds diagramBounds) {
+		this.diagramBounds = diagramBounds;
+	}
+	
+	public Bounds getDiagramBounds() {
+		return diagramBounds;
 	}
 }

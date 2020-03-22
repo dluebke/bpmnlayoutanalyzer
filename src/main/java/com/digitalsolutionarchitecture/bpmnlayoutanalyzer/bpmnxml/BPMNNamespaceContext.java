@@ -15,6 +15,7 @@ public class BPMNNamespaceContext implements NamespaceContext {
 		addNamespace("http://www.omg.org/spec/BPMN/20100524/MODEL", "bpmn");
 		addNamespace("http://www.omg.org/spec/BPMN/20100524/DI", "bpmndi");
 		addNamespace("http://www.omg.org/spec/DD/20100524/DI", "di");
+		addNamespace("http://www.omg.org/spec/DD/20100524/DC", "dc");
 	}
 
 	private void addNamespace(String uri, String prefix) {

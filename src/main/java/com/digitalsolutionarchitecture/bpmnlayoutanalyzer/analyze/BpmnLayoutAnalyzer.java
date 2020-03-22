@@ -27,6 +27,7 @@ import com.digitalsolutionarchitecture.bpmnlayoutanalyzer.analyze.edges.EdgeDire
 import com.digitalsolutionarchitecture.bpmnlayoutanalyzer.analyze.edges.EdgeWaypointOptimizer;
 import com.digitalsolutionarchitecture.bpmnlayoutanalyzer.analyze.exporter.ExporterEstimator;
 import com.digitalsolutionarchitecture.bpmnlayoutanalyzer.analyze.exporter.ExporterInfo;
+import com.digitalsolutionarchitecture.bpmnlayoutanalyzer.bpmnmodel.Bounds;
 import com.digitalsolutionarchitecture.bpmnlayoutanalyzer.bpmnmodel.WayPoint;
 import com.digitalsolutionarchitecture.bpmnlayoutanalyzer.bpmnxml.BPMNNamespaceContext;
 import com.digitalsolutionarchitecture.bpmnlayoutanalyzer.bpmnxml.XMLReaderHelper;
@@ -37,17 +38,23 @@ public class BpmnLayoutAnalyzer {
 	private EdgeDirectionEvaluator edgeDirectionEvaluator = new EdgeDirectionEvaluator();
 	private EdgeWaypointOptimizer edgeWaypointOptimizer = new EdgeWaypointOptimizer();
 	private XPathExpression xpDiagrams;
+	private XPathExpression xpShapes;
 	private XPathExpression xpEdges;
 	private XPathExpression xpSequenceFlows;
 	private BPMNNamespaceContext bpmnNamespaceContext = new BPMNNamespaceContext();
 	
-	public BpmnLayoutAnalyzer() throws XPathExpressionException {
-		XPath xpath = XPathFactory.newDefaultInstance().newXPath();
-		xpath.setNamespaceContext(bpmnNamespaceContext);
-		
-		xpDiagrams = xpath.compile("//bpmndi:BPMNDiagram");
-		xpEdges = xpath.compile("//bpmndi:BPMNEdge");
-		xpSequenceFlows = xpath.compile("//bpmn:sequenceFlow");
+	public BpmnLayoutAnalyzer() {
+		try {
+			XPath xpath = XPathFactory.newDefaultInstance().newXPath();
+			xpath.setNamespaceContext(bpmnNamespaceContext);
+			
+			xpDiagrams = xpath.compile("//bpmndi:BPMNDiagram");
+			xpEdges = xpath.compile("//bpmndi:BPMNEdge");
+			xpShapes = xpath.compile("//bpmndi:BPMNShape");
+			xpSequenceFlows = xpath.compile("//bpmn:sequenceFlow");
+		} catch(Exception e) {
+			throw new RuntimeException(e); 
+		}
 	}
 	
 	public List<Result> analyze(File bpmnModelFile) throws SAXException, IOException, ParserConfigurationException, XPathExpressionException {
@@ -73,6 +80,7 @@ public class BpmnLayoutAnalyzer {
 				);
 				
 				analyzeSequenceFlows(diagram, idsOfSequenceFlows, result);
+				anaylzeDiagramSize(diagram, result);
 				
 				result.calculateMetrics();
 				results.add(result);
@@ -80,6 +88,25 @@ public class BpmnLayoutAnalyzer {
 		}
 		
 		return results;
+	}
+
+	private void anaylzeDiagramSize(Element diagram, Result result) throws XPathExpressionException {
+		Bounds diagramBounds = new Bounds(Double.MAX_VALUE, Double.MAX_VALUE, Double.MIN_VALUE, Double.MIN_VALUE);
+		
+		try {
+			NodeList shapes = (NodeList) xpShapes.evaluate(diagram, XPathConstants.NODESET);
+			for(int i = 0; i < shapes.getLength(); i++) {
+				Element boundsElement = (Element)((Element)shapes.item(i)).getElementsByTagNameNS(bpmnNamespaceContext.getNamespaceURI("dc"), "Bounds").item(0);
+				Bounds shapeBounds = XMLReaderHelper.convertToBounds(boundsElement);
+				diagramBounds.extendTo(shapeBounds);
+			}
+			
+		} catch(Exception e) {
+			System.err.println("Cannot evaluate diagram size");
+			e.printStackTrace();
+			diagramBounds.set(Double.NaN, Double.NaN, Double.NaN, Double.NaN);
+		}
+		result.setDiagramBounds(diagramBounds);
 	}
 
 	private void analyzeSequenceFlows(Element diagram, Set<String> idsOfSequenceFlows, Result result)
