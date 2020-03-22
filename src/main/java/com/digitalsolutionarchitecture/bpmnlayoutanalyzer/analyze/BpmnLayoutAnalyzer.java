@@ -36,6 +36,19 @@ public class BpmnLayoutAnalyzer {
 	private ExporterEstimator toolEstimator = new ExporterEstimator();
 	private EdgeDirectionEvaluator edgeDirectionEvaluator = new EdgeDirectionEvaluator();
 	private EdgeWaypointOptimizer edgeWaypointOptimizer = new EdgeWaypointOptimizer();
+	private XPathExpression xpDiagrams;
+	private XPathExpression xpEdges;
+	private XPathExpression xpSequenceFlows;
+	private BPMNNamespaceContext bpmnNamespaceContext = new BPMNNamespaceContext();
+	
+	public BpmnLayoutAnalyzer() throws XPathExpressionException {
+		XPath xpath = XPathFactory.newDefaultInstance().newXPath();
+		xpath.setNamespaceContext(bpmnNamespaceContext);
+		
+		xpDiagrams = xpath.compile("//bpmndi:BPMNDiagram");
+		xpEdges = xpath.compile("//bpmndi:BPMNEdge");
+		xpSequenceFlows = xpath.compile("//bpmn:sequenceFlow");
+	}
 	
 	public List<Result> analyze(File bpmnModelFile) throws SAXException, IOException, ParserConfigurationException, XPathExpressionException {
 		List<Result> results = new ArrayList<>();
@@ -46,22 +59,11 @@ public class BpmnLayoutAnalyzer {
 		try(InputStream in = new FileInputStream(bpmnModelFile)) {
 			Document document = dbf.newDocumentBuilder().parse(in);
 			
-			XPath xpath = XPathFactory.newDefaultInstance().newXPath();
-			BPMNNamespaceContext bpmnNamespaceContext = new BPMNNamespaceContext();
-			xpath.setNamespaceContext(bpmnNamespaceContext);
-			XPathExpression xpDiagrams = xpath.compile("//bpmndi:BPMNDiagram");
-			XPathExpression xpEdges = xpath.compile("//bpmndi:BPMNEdge");
-			XPathExpression xpSequenceFlows = xpath.compile("//bpmn:sequenceFlow");
-			
-			Set<String> idsOfSequenceFlows = new HashSet<>();
-			NodeList sequenceFlows = (NodeList) xpSequenceFlows.evaluate(document, XPathConstants.NODESET);
-			for(int i = 0; i < sequenceFlows.getLength(); i++) {
-				String id = sequenceFlows.item(i).getAttributes().getNamedItem("id").getNodeValue();
-				idsOfSequenceFlows.add(id);
-			}
+			Set<String> idsOfSequenceFlows = gatherAllSequenceFlowIds(document);
 			
 			NodeList diagrams = (NodeList) xpDiagrams.evaluate(document, XPathConstants.NODESET);
 			for(int i = 0; i < diagrams.getLength(); i++) {
+				Element diagram = (Element)diagrams.item(i);
 				ExporterInfo toolInfo = toolEstimator.estimate(document.getDocumentElement());
 				Result result = new Result(
 					bpmnModelFile.getName(),
@@ -70,20 +72,8 @@ public class BpmnLayoutAnalyzer {
 					toolInfo.getExporterVersion()
 				);
 				
-				NodeList edges = (NodeList) xpEdges.evaluate(document, XPathConstants.NODESET);
-				for(int j = 0; j < edges.getLength(); j++) {
-					Element edge = (Element)edges.item(j);
-					if(idsOfSequenceFlows.contains(edge.getAttribute("bpmnElement"))) {
-						NodeList waypointsNodeList = edge.getElementsByTagNameNS(bpmnNamespaceContext.getNamespaceURI("di"), "waypoint");
-						List<WayPoint> waypoints = XMLReaderHelper.convertToWayPoints(waypointsNodeList);
-						boolean optimized = edgeWaypointOptimizer.optimize(waypoints);
-						EdgeDirection at = edgeDirectionEvaluator.evaluateArcType(waypoints);
-						result.addSequenceFlow(at);
-						if(optimized) {
-							result.addOptimizableSequenceFlow(at);
-						}
-					}
-				}
+				analyzeSequenceFlows(diagram, idsOfSequenceFlows, result);
+				
 				result.calculateMetrics();
 				results.add(result);
 			}
@@ -92,7 +82,33 @@ public class BpmnLayoutAnalyzer {
 		return results;
 	}
 
-	
+	private void analyzeSequenceFlows(Element diagram, Set<String> idsOfSequenceFlows, Result result)
+			throws XPathExpressionException {
+		NodeList edges = (NodeList) xpEdges.evaluate(diagram, XPathConstants.NODESET);
+		for(int j = 0; j < edges.getLength(); j++) {
+			Element edge = (Element)edges.item(j);
+			if(idsOfSequenceFlows.contains(edge.getAttribute("bpmnElement"))) {
+				NodeList waypointsNodeList = edge.getElementsByTagNameNS(bpmnNamespaceContext.getNamespaceURI("di"), "waypoint");
+				List<WayPoint> waypoints = XMLReaderHelper.convertToWayPoints(waypointsNodeList);
+				boolean optimized = edgeWaypointOptimizer.optimize(waypoints);
+				EdgeDirection at = edgeDirectionEvaluator.evaluateArcType(waypoints);
+				result.addSequenceFlow(at);
+				if(optimized) {
+					result.addOptimizableSequenceFlow(at);
+				}
+			}
+		}
+	}
+
+	private Set<String> gatherAllSequenceFlowIds(Document document) throws XPathExpressionException {
+		Set<String> idsOfSequenceFlows = new HashSet<>();
+		NodeList sequenceFlows = (NodeList) xpSequenceFlows.evaluate(document, XPathConstants.NODESET);
+		for(int i = 0; i < sequenceFlows.getLength(); i++) {
+			String id = sequenceFlows.item(i).getAttributes().getNamedItem("id").getNodeValue();
+			idsOfSequenceFlows.add(id);
+		}
+		return idsOfSequenceFlows;
+	}
 	
 	static int calDegree(WayPoint wp1, WayPoint wpLast) {
 		double x0 = wp1.getX();
