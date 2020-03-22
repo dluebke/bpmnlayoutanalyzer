@@ -8,6 +8,8 @@ import javax.xml.namespace.NamespaceContext;
 
 public class BPMNNamespaceContext implements NamespaceContext {
 
+	public static final NamespaceContext DEFAULT = new BPMNNamespaceContext();
+	
 	private Map<String, String> namespaceByUri = new HashMap<>();
 	private Map<String, String> namespaceByPrefix = new HashMap<>();
 	

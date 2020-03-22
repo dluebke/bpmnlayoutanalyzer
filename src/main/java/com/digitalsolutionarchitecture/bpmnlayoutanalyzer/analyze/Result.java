@@ -20,11 +20,9 @@ public class Result {
 	private int diagramNo;
 	private Bounds diagramBounds;
 	
-	public Result(String name, int diagramNo, String exporter, String exporterVersion) {
+	public Result(String name, int diagramNo) {
 		this.name = name;
 		this.diagramNo = diagramNo;
-		this.exporter = exporter;
-		this.exporterVersion = exporterVersion;
 	}
 
 	public void calculateMetrics() {
@@ -107,5 +105,13 @@ public class Result {
 	
 	public Bounds getDiagramBounds() {
 		return diagramBounds;
+	}
+	
+	public void setExporter(String exporter) {
+		this.exporter = exporter;
+	}
+	
+	public void setExporterVersion(String exporterVersion) {
+		this.exporterVersion = exporterVersion;
 	}
 }
