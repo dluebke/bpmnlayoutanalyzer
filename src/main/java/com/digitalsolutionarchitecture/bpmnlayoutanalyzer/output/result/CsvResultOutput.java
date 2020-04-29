@@ -40,6 +40,9 @@ public class CsvResultOutput {
 		headers.add("DIAGRAM_WIDTH");
 		headers.add("DIAGRAM_HEIGHT");
 		headers.add("DIAGRAM_AREA");
+		headers.add("POOLORIENTATION_HORIZONTAL");
+		headers.add("POOLORIENTATION_VERTICAL");
+		headers.add("POOLORIENTATION_UNKONWN");
 		
 		HEADERS = headers.toArray(new String[headers.size()]);
 	}
@@ -73,6 +76,9 @@ public class CsvResultOutput {
 			fields.add(Double.toString(r.getDiagramBounds().getWidth()));
 			fields.add(Double.toString(r.getDiagramBounds().getHeight()));
 			fields.add(Double.toString(r.getDiagramBounds().getArea()));
+			fields.add(Integer.toString(r.getPoolOrientationHorizontal()));
+			fields.add(Integer.toString(r.getPoolOrientationVertical()));
+			fields.add(Integer.toString(r.getPoolOrientationUnknown()));
 			
 			writeLine(out, fields.toArray(new String[fields.size()]));
 			fields.clear();

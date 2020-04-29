@@ -10,7 +10,7 @@ import java.util.List;
 import com.digitalsolutionarchitecture.bpmnlayoutanalyzer.analyze.BpmnLayoutAnalyzer;
 import com.digitalsolutionarchitecture.bpmnlayoutanalyzer.analyze.Result;
 import com.digitalsolutionarchitecture.bpmnlayoutanalyzer.output.result.CsvResultOutput;
-import com.digitalsolutionarchitecture.bpmnlayoutanalyzer.util.javaio.FileSuffixFilter;
+import com.digitalsolutionarchitecture.bpmnlayoutanalyzer.util.javaio.FileNamePartFilter;
 
 public class BpmnLayoutAnalyzerMain {
 
@@ -47,7 +47,7 @@ public class BpmnLayoutAnalyzerMain {
 				e.printStackTrace();
 			}
 		} else if(f.isDirectory()) {
-			File[] possibleFiles = f.listFiles(new FileSuffixFilter(".bpmn"));
+			File[] possibleFiles = f.listFiles(new FileNamePartFilter(".bpmn"));
 			for(File g : possibleFiles) {
 				analyzeFileOrDirectory(results, anaylzer, g);
 			}

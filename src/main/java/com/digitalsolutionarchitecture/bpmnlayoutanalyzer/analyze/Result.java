@@ -19,6 +19,9 @@ public class Result {
 	private String name;
 	private int diagramNo;
 	private Bounds diagramBounds;
+	private int poolOrientationUnknown;
+	private int poolOrientationVertical;
+	private int poolOrientationHorizontal;
 	
 	public Result(String name, int diagramNo) {
 		this.name = name;
@@ -113,5 +116,29 @@ public class Result {
 	
 	public void setExporterVersion(String exporterVersion) {
 		this.exporterVersion = exporterVersion;
+	}
+
+	public void incPoolOrientationHorizontal() {
+		poolOrientationHorizontal++;
+	}
+
+	public void incPoolOrientationVertical() {
+		poolOrientationVertical++;
+	}
+
+	public void incPoolOrientationUnknown() {
+		poolOrientationUnknown++;
+	}
+	
+	public int getPoolOrientationHorizontal() {
+		return poolOrientationHorizontal;
+	}
+	
+	public int getPoolOrientationVertical() {
+		return poolOrientationVertical;
+	}
+	
+	public int getPoolOrientationUnknown() {
+		return poolOrientationUnknown;
 	}
 }

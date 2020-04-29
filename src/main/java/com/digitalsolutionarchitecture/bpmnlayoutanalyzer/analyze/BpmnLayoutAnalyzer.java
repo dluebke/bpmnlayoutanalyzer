@@ -22,6 +22,7 @@ import org.w3c.dom.NodeList;
 import org.xml.sax.SAXException;
 
 import com.digitalsolutionarchitecture.bpmnlayoutanalyzer.analyze.diagramsize.DiagramDimensionAnalyzer;
+import com.digitalsolutionarchitecture.bpmnlayoutanalyzer.analyze.edges.PoolOrientationEvaluator;
 import com.digitalsolutionarchitecture.bpmnlayoutanalyzer.analyze.edges.SequenceFlowDirectionAnalyzer;
 import com.digitalsolutionarchitecture.bpmnlayoutanalyzer.analyze.exporter.ExporterEstimator;
 import com.digitalsolutionarchitecture.bpmnlayoutanalyzer.bpmnmodel.WayPoint;
@@ -36,7 +37,8 @@ public class BpmnLayoutAnalyzer {
 	private IBpmnAnaylzer[] analyzers = new IBpmnAnaylzer[] {
 			new ExporterEstimator(),
 			new SequenceFlowDirectionAnalyzer(),
-			new DiagramDimensionAnalyzer()
+			new DiagramDimensionAnalyzer(),
+			new PoolOrientationEvaluator()
 	};
 	
 	public BpmnLayoutAnalyzer() {
