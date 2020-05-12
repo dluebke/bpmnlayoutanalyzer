@@ -1,4 +1,4 @@
-package com.digitalsolutionarchitecture.bpmnlayoutanalyzer.analyze.edges;
+package com.digitalsolutionarchitecture.bpmnlayoutanalyzer.bpmnmodel;
 
 public enum EdgeDirection {
 	
@@ -36,8 +36,7 @@ public enum EdgeDirection {
 	BEND_RIGHT_LEFT,
 	BEND_RIGHT_LOWERLEFT,
 	BEND_TOP_BOTTOM,
-	BEND_LEFT_LOWERRIGHT,
-	BEND_ORIGIN;
+	BEND_LEFT_LOWERRIGHT;
 	
 	public static final EdgeDirection[] LEFT_RIGHT_FACING_ARCS = new EdgeDirection[] { 
 		EdgeDirection.BEND_LEFT_LOWERRIGHT, 

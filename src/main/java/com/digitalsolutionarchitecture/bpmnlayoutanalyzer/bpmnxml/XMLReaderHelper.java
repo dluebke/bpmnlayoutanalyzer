@@ -1,8 +1,5 @@
 package com.digitalsolutionarchitecture.bpmnlayoutanalyzer.bpmnxml;
 
-import java.util.ArrayList;
-import java.util.List;
-
 import org.w3c.dom.Element;
 import org.w3c.dom.NamedNodeMap;
 import org.w3c.dom.Node;
@@ -10,6 +7,7 @@ import org.w3c.dom.NodeList;
 
 import com.digitalsolutionarchitecture.bpmnlayoutanalyzer.bpmnmodel.Bounds;
 import com.digitalsolutionarchitecture.bpmnlayoutanalyzer.bpmnmodel.WayPoint;
+import com.digitalsolutionarchitecture.bpmnlayoutanalyzer.bpmnmodel.WayPointList;
 
 public class XMLReaderHelper {
 
@@ -24,8 +22,8 @@ public class XMLReaderHelper {
 		return wp;
 	}
 
-	public static List<WayPoint> convertToWayPoints(NodeList waypointsNodeList) {
-		List<WayPoint> result = new ArrayList<>();
+	public static WayPointList convertToWayPoints(NodeList waypointsNodeList) {
+		WayPointList result = new WayPointList();
 		for(int i = 0; i < waypointsNodeList.getLength(); i++) {
 			result.add(fromDiElement(waypointsNodeList.item(i)));
 		}

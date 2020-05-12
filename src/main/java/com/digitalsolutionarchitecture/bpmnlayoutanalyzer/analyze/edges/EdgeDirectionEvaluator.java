@@ -18,7 +18,7 @@ public class EdgeDirectionEvaluator {
 			} else if(wp1.getX() > wpLast.getX()) {
 				direction = "RIGHT_LEFT"; 
 			} else {
-				direction = ""; // TODO Return to origin
+				direction = "ORIGIN"; // TODO Return to origin
 			}
 		} else if(DoubleUtil.equals(wp1.getX(), wpLast.getX())) {
 			if(wp1.getY() < wpLast.getY()) {

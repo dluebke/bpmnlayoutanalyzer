@@ -63,15 +63,6 @@ public class Bounds {
 		this.width = width;
 	}
 
-	public boolean setMaxWidth(double width) {
-		if (this.width <= width) {
-			this.width = width;
-			return true;
-		} else {
-			return false;
-		}
-	}
-
 	public double getHeight() {
 		return height;
 	}
@@ -80,24 +71,53 @@ public class Bounds {
 		this.height = height;
 	}
 
-	public boolean setMaxHeight(double height) {
-		if (this.height <= height) {
-			this.height = height;
-			return true;
-		} else {
-			return false;
-		}
-	}
-
-	public void extendTo(Bounds shapeBounds) {
-		setMinX(shapeBounds.getX());
-		setMinY(shapeBounds.getY());
-		setMaxWidth(shapeBounds.getWidth());
-		setMaxHeight(shapeBounds.getHeight());
+	public void extendTo(Bounds b) {
+		if(b == null)
+			return;
+		
+		double myMaxX = getX() + getWidth();
+		double myMaxY = getY() + getHeight();
+		double theirMaxX = b.getX() + b.getWidth();
+		double theirMaxY = b.getY() + b.getHeight();
+		
+		double maxX = Math.max(myMaxX, theirMaxX);
+		double maxY = Math.max(myMaxY, theirMaxY);
+				
+		setMinX(b.getX());
+		setMinY(b.getY());
+		
+		
+		setWidth(maxX - getX());
+		setHeight(maxY - getY());
 	}
 
 	public double getArea() {
 		return getWidth() * getHeight();
+	}
+	
+	@Override
+	public boolean equals(Object o) {
+		if(this == o) {
+			return true;
+		}
+		
+		if(this.getClass() != o.getClass()) {
+			return false;
+		}
+		
+		Bounds b = (Bounds)o;
+		
+		return
+			this.x == b.x &&
+			this.y == b.y &&
+			this.width == b.width &&
+			this.height == b.height
+		;
+	}
+	
+	@Override
+	public int hashCode() {
+		return Double.hashCode(x + y + width + height);
 	}
 
 }

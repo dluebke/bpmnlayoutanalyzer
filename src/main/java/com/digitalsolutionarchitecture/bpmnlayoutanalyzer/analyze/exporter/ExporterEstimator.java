@@ -7,17 +7,13 @@ import java.util.Map;
 import org.w3c.dom.Document;
 import org.w3c.dom.Element;
 
-import com.digitalsolutionarchitecture.bpmnlayoutanalyzer.analyze.IBpmnAnaylzer;
-import com.digitalsolutionarchitecture.bpmnlayoutanalyzer.analyze.Result;
 import com.digitalsolutionarchitecture.bpmnlayoutanalyzer.util.StringUtil;
 import com.digitalsolutionarchitecture.bpmnlayoutanalyzer.util.XmlUtil;
 
-public class ExporterEstimator implements IBpmnAnaylzer {
+public class ExporterEstimator {
 
 	private Map<String, ExporterInfo> namespacesForTool;
 
-	private ExporterInfo exporterInfo;
-	
 	public static final ExporterInfo ACTIVITI = new ExporterInfo("Activiti");
 	public static final ExporterInfo BIZAGI = new ExporterInfo("Bizagi");
 	public static final ExporterInfo CAMUNDA = new ExporterInfo("Camunda");
@@ -44,51 +40,47 @@ public class ExporterEstimator implements IBpmnAnaylzer {
 		return result;
 	}
 
-	@Override
-	public void performPreAnalysisOfModel(Document bpmnDocument) {
+	public ExporterInfo estimateExporter(Document bpmnDocument) {
 		Element documentElement = bpmnDocument.getDocumentElement();
 		
 		String exporter = documentElement.getAttribute("exporter");
 		String exporterVersion = documentElement.getAttribute("exporterVersion");
 		
 		if(!StringUtil.isEmpty(exporter)) {
-			this.exporterInfo = new ExporterInfo(exporter, exporterVersion);
-			return;
+			return new ExporterInfo(exporter, exporterVersion);
 		} 
 		
 		List<String> namespaceURIs = XmlUtil.gatherDirectlyDeclaredNamespaceUris(documentElement);
 		for(String namespaceUri : namespaceURIs) {
 			ExporterInfo t = namespacesForTool.get(namespaceUri);
 			if(t != null) {
-				exporterInfo = t;
-				return;
+				return t;
 			}
 		}
 		
 		String targetNamespace = documentElement.getAttribute("targetNamespace");
 		if(!StringUtil.isEmpty(targetNamespace)) {
 			if(namespacesForTool.containsKey(targetNamespace)) {
-				exporterInfo = namespacesForTool.get(targetNamespace);
-				return;
+				return namespacesForTool.get(targetNamespace);
 			}
 			
 			if("http://bpmn.io/schema/bpmn".equals(targetNamespace)) {
-				exporterInfo = new ExporterInfo("bpmn.io?");
-				return;
+				return new ExporterInfo("bpmn.io?");
 			} else if(targetNamespace.startsWith("http://www.trisotech.com/")) {
-				exporterInfo = new ExporterInfo("Trisotech Workflow Modeler?");
-				return;
+				return new ExporterInfo("Trisotech Workflow Modeler?");
 			} else if(targetNamespace.startsWith("http://activiti.org")) {
-				exporterInfo = ACTIVITI;
-				return;
+				return ACTIVITI;
 			}
 		}
 		
 		try {
 			Element firstProcessElement = (Element)documentElement.getElementsByTagNameNS("http://www.omg.org/spec/BPMN/20100524/MODEL", "process").item(0);
-			if(firstProcessElement.getAttribute("id").startsWith("sid-")) {
-				exporterInfo = SIGNAVIO;
-				return;
+			if(
+				firstProcessElement != null && 
+				firstProcessElement.getAttribute("id") != null && 
+				firstProcessElement.getAttribute("id").startsWith("sid-")
+			) {
+				return SIGNAVIO;
 			}
 		} catch(Exception e) {
 			// ignore access to nowhere
@@ -96,17 +88,10 @@ public class ExporterEstimator implements IBpmnAnaylzer {
 		
 		// <bizagi:BizagiExtensions xmlns:bizagi="http://www.bizagi.com/bpmn20">
 		if(documentElement.getElementsByTagNameNS("http://www.bizagi.com/bpmn20", "BizagiExtensions").getLength() > 0) {
-			exporterInfo = BIZAGI;
-			return;
+			return BIZAGI;
 		}
 		
-		exporterInfo = new ExporterInfo(null, null);
-	}
-	
-	@Override
-	public void analyse(Element bpmnDiagram, Result result) {
-		result.setExporter(exporterInfo.getExporter());
-		result.setExporterVersion(exporterInfo.getExporterVersion());
+		return new ExporterInfo(null, null);
 	}
 	
 }
