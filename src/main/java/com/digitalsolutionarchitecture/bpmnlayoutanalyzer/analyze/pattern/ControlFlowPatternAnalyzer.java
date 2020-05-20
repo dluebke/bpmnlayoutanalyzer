@@ -10,6 +10,7 @@ import com.digitalsolutionarchitecture.bpmnlayoutanalyzer.bpmnmodel.BpmnProcess;
 import com.digitalsolutionarchitecture.bpmnlayoutanalyzer.bpmnmodel.FlowNode;
 import com.digitalsolutionarchitecture.bpmnlayoutanalyzer.output.CsvWriter;
 import com.digitalsolutionarchitecture.bpmnlayoutanalyzer.output.CsvWriterOptions;
+import com.digitalsolutionarchitecture.bpmnlayoutanalyzer.util.StringUtil;
 
 public class ControlFlowPatternAnalyzer implements IBpmnAnalyzer {
 	
@@ -21,6 +22,28 @@ public class ControlFlowPatternAnalyzer implements IBpmnAnalyzer {
 			if(fn.hasLayoutData()) {
 				identifyBoundaryEvents(fn, processWithDiagramData);
 				identifyEventBasedGateways(fn, processWithDiagramData);
+				identifyXorJoins(fn, processWithDiagramData);
+				identifyAndSplits(fn, processWithDiagramData);
+			}
+		}
+	}
+
+	private void identifyXorJoins(FlowNode fn, BpmnProcess p) {
+		if(fn.getIncomingSequenceFlows().size() > 1) {
+			if(fn.getType().equals("exlusiveGateway")) {
+				results.add(new ControlFlowPatternAnalyzerResult(p, "ExplicitXorJoin", "ExclusiveGateway", fn.getIncomingSequenceFlows().size()));
+			} else if(!fn.getType().endsWith("Gateway")) {
+				results.add(new ControlFlowPatternAnalyzerResult(p, "ImplicitXorJoin", StringUtil.toFirstUpper(fn.getTypeAndEventType()), fn.getIncomingSequenceFlows().size()));
+			}
+		}
+	}
+	
+	private void identifyAndSplits(FlowNode fn, BpmnProcess p) {
+		if(fn.getOutgoingSequenceFlows().size() > 1) {
+			if(fn.getType().equals("parallelGateway")) {
+				results.add(new ControlFlowPatternAnalyzerResult(p, "ExplicitAndSplit", "ParallelGateway", fn.getOutgoingSequenceFlows().size()));
+			} else if(!fn.getType().endsWith("Gateway")) {
+				results.add(new ControlFlowPatternAnalyzerResult(p, "ImplicitAndSplit", StringUtil.toFirstUpper(fn.getTypeAndEventType()), fn.getOutgoingSequenceFlows().size()));
 			}
 		}
 	}
