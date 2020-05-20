@@ -31,12 +31,17 @@ public class XMLReaderHelper {
 	}
 
 	public static Bounds convertToBounds(Element boundsElement) {
-		return new Bounds(
-			Double.parseDouble(boundsElement.getAttribute("x")),
-			Double.parseDouble(boundsElement.getAttribute("y")),
-			Double.parseDouble(boundsElement.getAttribute("width")),
-			Double.parseDouble(boundsElement.getAttribute("height"))
-		);
+		try {
+			return new Bounds(
+				Double.parseDouble(boundsElement.getAttribute("x")),
+				Double.parseDouble(boundsElement.getAttribute("y")),
+				Double.parseDouble(boundsElement.getAttribute("width")),
+				Double.parseDouble(boundsElement.getAttribute("height"))
+			);
+		} catch(Exception e) {
+			e.printStackTrace();
+			return null;
+		}
 	}
 
 }

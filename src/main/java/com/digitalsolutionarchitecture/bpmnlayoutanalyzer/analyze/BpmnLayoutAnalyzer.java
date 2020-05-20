@@ -5,6 +5,9 @@ import java.io.FileInputStream;
 import java.io.IOException;
 import java.io.InputStream;
 import java.io.StringReader;
+import java.util.HashMap;
+import java.util.Map;
+import java.util.Map.Entry;
 
 import javax.xml.namespace.NamespaceContext;
 import javax.xml.parsers.DocumentBuilder;
@@ -18,6 +21,7 @@ import javax.xml.xpath.XPathFactory;
 
 import org.w3c.dom.Document;
 import org.w3c.dom.Element;
+import org.w3c.dom.Node;
 import org.w3c.dom.NodeList;
 import org.xml.sax.EntityResolver;
 import org.xml.sax.InputSource;
@@ -27,6 +31,7 @@ import com.digitalsolutionarchitecture.bpmnlayoutanalyzer.analyze.diagramsize.Di
 import com.digitalsolutionarchitecture.bpmnlayoutanalyzer.analyze.edges.SequenceFlowDirectionSummaryAnalyzer;
 import com.digitalsolutionarchitecture.bpmnlayoutanalyzer.analyze.edges.SequenceFlowReporter;
 import com.digitalsolutionarchitecture.bpmnlayoutanalyzer.analyze.exporter.ExporterEstimator;
+import com.digitalsolutionarchitecture.bpmnlayoutanalyzer.analyze.pattern.ControlFlowPatternAnalyzer;
 import com.digitalsolutionarchitecture.bpmnlayoutanalyzer.analyze.pools.PoolOrientationEvaluator;
 import com.digitalsolutionarchitecture.bpmnlayoutanalyzer.bpmnmodel.BpmnProcess;
 import com.digitalsolutionarchitecture.bpmnlayoutanalyzer.bpmnmodel.FlowNode;
@@ -56,7 +61,8 @@ public class BpmnLayoutAnalyzer {
 			new SequenceFlowDirectionSummaryAnalyzer(),
 			new DiagramDimensionAnalyzer(),
 			new PoolOrientationEvaluator(),
-			new SequenceFlowReporter()
+			new SequenceFlowReporter(),
+			new ControlFlowPatternAnalyzer()
 	};
 
 	private ExporterEstimator exporterEstimator = new ExporterEstimator();
@@ -148,13 +154,50 @@ public class BpmnLayoutAnalyzer {
 	}
 
 	private void collectAllFlowNodes(Document bpmnDocument) throws XPathExpressionException {
+		Map<FlowNode, String> attachedToId = new HashMap<>();
+		
 		NodeList flowNodeElements = (NodeList) xpFlowNodes.evaluate(bpmnDocument, XPathConstants.NODESET);
 		for(int i = 0; i < flowNodeElements.getLength(); i++) {
 			Element e = (Element)flowNodeElements.item(i);
 			String id = e.getAttribute("id");
 			String type = e.getLocalName();
 			FlowNode fn = new FlowNode(id, type);
+			
+			if(e.getLocalName().equals("boundaryEvent")) {
+				String cancelActivityAttribute = e.getAttribute("cancelActivity");
+				if(cancelActivityAttribute != null && !"".equals(cancelActivityAttribute)) {
+					boolean cancelActivity = "true".equals(cancelActivityAttribute);
+					fn.setCancelActivity(cancelActivity);
+				}
+				
+				String attachedToRef = e.getAttribute("attachedToRef");
+				if(attachedToRef != null) {
+					attachedToId.put(fn, attachedToRef);
+				}
+			}
+			if(e.getLocalName().endsWith("Event")) {
+				NodeList children = e.getChildNodes();
+				for(int x = 0; x < children.getLength(); x++) {
+					Node n = children.item(x);
+					if(n.getNodeType() == Node.ELEMENT_NODE && n.getLocalName().endsWith("EventDefinition")) {
+						String eventType = n.getLocalName().replace("EventDefintion", "");
+						fn.setEventType(eventType);
+					}
+				}
+			}
+			
 			process.add(fn);
+		}
+		
+		for(Entry<FlowNode, String> entry : attachedToId.entrySet()) {
+			try {
+				FlowNode attachedToNode = process.getFlowNodeById(entry.getValue());
+				entry.getKey().setAttachedTo(attachedToNode);
+				attachedToNode.addBoundaryEvent(entry.getKey());
+			} catch(Exception e) {
+				System.err.println("Error attaching boundary event " + entry.getKey().getId() + " to " + entry.getValue());
+				e.printStackTrace();
+			}
 		}
 	}
 

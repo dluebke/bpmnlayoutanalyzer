@@ -20,7 +20,7 @@ public class SequenceFlowReporter implements IBpmnAnalyzer {
 	@Override
 	public void analyze(BpmnProcess p) {
 		for(SequenceFlow sf : p.getSequenceFlows()) {
-			if(sf.getWayPoints() != null) {
+			if(sf.hasLayoutData()) {
 				try {
 					SequenceFlowReportItem result = new SequenceFlowReportItem(p);
 					result.id = sf.getId();

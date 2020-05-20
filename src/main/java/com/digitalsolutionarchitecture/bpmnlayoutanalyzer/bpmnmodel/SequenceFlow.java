@@ -31,6 +31,7 @@ public class SequenceFlow implements RepresentedByWayPoints {
 			this.source.getOutgoingSequenceFlows().remove(this);
 		}
 		this.source = source;
+		source.addOutgoingSequenceFlow(this);
 	}
 	
 	public FlowNode getTarget() {
@@ -42,6 +43,7 @@ public class SequenceFlow implements RepresentedByWayPoints {
 			this.target.getIncomingSequenceFlows().remove(this);
 		}
 		this.target = target;
+		target.addIncomingSequenceFlows(this);
 	}
 
 	public WayPointList getWayPoints() {
@@ -55,5 +57,10 @@ public class SequenceFlow implements RepresentedByWayPoints {
 	@Override
 	public void clearLayoutData() {
 		wayPoints = null;
+	}
+	
+	@Override
+	public boolean hasLayoutData() {
+		return wayPoints != null;
 	}
 }

@@ -22,7 +22,7 @@ public class PoolOrientationEvaluator implements IBpmnAnalyzer {
 		PoolOrientationResult result = new PoolOrientationResult(pr);
 		
 		for(Participant p : pr.getParticipants()) {
-			if(p.getBounds() != null) {
+			if(p.hasLayoutData()) {
 				if(p.getIsHorizontal() == null) {
 					result.incPoolOrientationUnknown();
 				} else if(p.getIsHorizontal()) {

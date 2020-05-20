@@ -37,5 +37,9 @@ public class Participant implements RepresentedByShape {
 	public void setIsHorizontal(Boolean isHorizontal) {
 		this.isHorizontal = isHorizontal;
 	}
-	
+
+	@Override
+	public boolean hasLayoutData() {
+		return bounds != null;
+	}
 }

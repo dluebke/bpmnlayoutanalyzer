@@ -1,8 +1,7 @@
 package com.digitalsolutionarchitecture.bpmnlayoutanalyzer.bpmnmodel;
 
-public interface RepresentedByWayPoints {
+public interface RepresentedByWayPoints extends RepresentedBy {
 
 	WayPointList getWayPoints();
-	void clearLayoutData();
 	
 }

@@ -45,7 +45,7 @@ public class SequenceFlowDirectionSummaryAnalyzer implements IBpmnAnalyzer {
 		SequenceFlowDirectionSummaryResult result = new SequenceFlowDirectionSummaryResult(p);
 		
 		for(SequenceFlow sf : p.getSequenceFlows()) {
-			if(sf.getWayPoints() != null) {
+			if(sf.hasLayoutData()) {
 				List<WayPoint> waypoints = new ArrayList<>(sf.getWayPoints().getWaypoints());
 				
 				boolean optimized = edgeWaypointOptimizer.optimize(waypoints);
@@ -86,7 +86,6 @@ public class SequenceFlowDirectionSummaryAnalyzer implements IBpmnAnalyzer {
 				fields.clear();
 			}
 		}
-		
 	}
 	
 }
