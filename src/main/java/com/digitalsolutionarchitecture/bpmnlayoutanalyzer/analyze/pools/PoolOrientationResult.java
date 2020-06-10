@@ -1,9 +1,16 @@
 package com.digitalsolutionarchitecture.bpmnlayoutanalyzer.analyze.pools;
 
+import java.util.Arrays;
+import java.util.List;
+
 import com.digitalsolutionarchitecture.bpmnlayoutanalyzer.analyze.Result;
 import com.digitalsolutionarchitecture.bpmnlayoutanalyzer.bpmnmodel.BpmnProcess;
 
 class PoolOrientationResult extends Result {
+	
+	final static String[] HEADERS = new String[] {
+		"Horizontal", "Vertical", "Unknown"
+	};
 	
 	private int poolOrientationUnknown;
 	private int poolOrientationVertical;
@@ -37,4 +44,12 @@ class PoolOrientationResult extends Result {
 		return poolOrientationUnknown;
 	}
 	
+	@Override
+	public List<Object> getValues() {
+		return Arrays.asList(
+			getPoolOrientationHorizontal(), 
+			getPoolOrientationVertical(), 
+			getPoolOrientationUnknown()
+		);
+	}
 }

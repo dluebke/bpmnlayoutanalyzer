@@ -1,9 +1,11 @@
 package com.digitalsolutionarchitecture.bpmnlayoutanalyzer.analyze;
 
+import java.util.List;
+
 import com.digitalsolutionarchitecture.bpmnlayoutanalyzer.analyze.exporter.ExporterInfo;
 import com.digitalsolutionarchitecture.bpmnlayoutanalyzer.bpmnmodel.BpmnProcess;
 
-public class Result {
+public abstract class Result {
 
 	public Result(BpmnProcess p) {
 		this(p.getFilename(), p.getDiagramIndex(), p.getExporterInfo());
@@ -19,5 +21,7 @@ public class Result {
 	public final String filename;
 	public final int digramIndex;
 	public final ExporterInfo exporterInfo;
+	
+	public abstract List<Object> getValues();
 
 }

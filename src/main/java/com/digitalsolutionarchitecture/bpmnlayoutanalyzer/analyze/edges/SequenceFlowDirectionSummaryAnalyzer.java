@@ -9,7 +9,7 @@ import com.digitalsolutionarchitecture.bpmnlayoutanalyzer.analyze.IBpmnAnalyzer;
 import com.digitalsolutionarchitecture.bpmnlayoutanalyzer.bpmnmodel.BpmnProcess;
 import com.digitalsolutionarchitecture.bpmnlayoutanalyzer.bpmnmodel.SequenceFlow;
 import com.digitalsolutionarchitecture.bpmnlayoutanalyzer.bpmnmodel.WayPoint;
-import com.digitalsolutionarchitecture.bpmnlayoutanalyzer.output.CsvWriter;
+import com.digitalsolutionarchitecture.bpmnlayoutanalyzer.output.CsvResultWriter;
 import com.digitalsolutionarchitecture.bpmnlayoutanalyzer.output.CsvWriterOptions;
 
 public class SequenceFlowDirectionSummaryAnalyzer implements IBpmnAnalyzer {
@@ -63,28 +63,9 @@ public class SequenceFlowDirectionSummaryAnalyzer implements IBpmnAnalyzer {
 	
 	@Override
 	public void writeReport(String baseName, CsvWriterOptions options) throws IOException {
-		try(CsvWriter out = new CsvWriter(baseName + ".sequenceflowsummary.csv", options)) {
+		try(CsvResultWriter out = new CsvResultWriter(baseName + ".sequenceflowsummary.csv", options)) {
 			out.writeHeader(HEADERS);
-			
-			List<Object> fields = new ArrayList<>();
-			for(SequenceFlowDirectionSummaryResult r : results) {
-				fields.addAll(Arrays.asList(
-					r.getDominantSequenceFlowDirection() != null ? r.getDominantSequenceFlowDirection().toString() : "", 
-					r.getDominantSequenceFlowDirectionPurity() >= 0.0 ? Double.toString(r.getDominantSequenceFlowDirectionPurity()) : ""
-				));
-				for(EdgeDirection at : EdgeDirection.values()) {
-					fields.add(r.getSequenceFlowDirections().get(at));
-				}
-				fields.add(r.getSequenceFlowDirections().sumAll());
-				for(EdgeDirection at : EdgeDirection.values()) {
-					fields.add(r.getOptimizableSequenceFlowDirections().get(at));
-				}
-				fields.add(r.getOptimizableSequenceFlowDirections().sumAll());
-
-				out.writeRecord(r, fields.toArray(new Object[fields.size()]));
-				
-				fields.clear();
-			}
+			out.writeRecords(results);
 		}
 	}
 	

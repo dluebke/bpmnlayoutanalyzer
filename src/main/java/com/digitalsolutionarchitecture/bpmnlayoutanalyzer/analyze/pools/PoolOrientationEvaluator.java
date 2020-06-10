@@ -7,7 +7,7 @@ import java.util.List;
 import com.digitalsolutionarchitecture.bpmnlayoutanalyzer.analyze.IBpmnAnalyzer;
 import com.digitalsolutionarchitecture.bpmnlayoutanalyzer.bpmnmodel.BpmnProcess;
 import com.digitalsolutionarchitecture.bpmnlayoutanalyzer.bpmnmodel.Participant;
-import com.digitalsolutionarchitecture.bpmnlayoutanalyzer.output.CsvWriter;
+import com.digitalsolutionarchitecture.bpmnlayoutanalyzer.output.CsvResultWriter;
 import com.digitalsolutionarchitecture.bpmnlayoutanalyzer.output.CsvWriterOptions;
 
 public class PoolOrientationEvaluator implements IBpmnAnalyzer {
@@ -38,12 +38,9 @@ public class PoolOrientationEvaluator implements IBpmnAnalyzer {
 
 	@Override
 	public void writeReport(String baseName, CsvWriterOptions options) throws IOException {
-		try(CsvWriter out = new CsvWriter(baseName + ".poolorientation.csv", options)) {
-			out.writeHeader("Horizontal", "Vertical", "Unknown");
-			
-			for(PoolOrientationResult result : results) {
-				out.writeRecord(result, result.getPoolOrientationHorizontal(), result.getPoolOrientationVertical(), result.getPoolOrientationUnknown());
-			}
+		try(CsvResultWriter out = new CsvResultWriter(baseName + ".poolorientation.csv", options)) {
+			out.writeHeader(PoolOrientationResult.HEADERS);
+			out.writeRecords(results);
 		}
 		
 	}

@@ -2,6 +2,7 @@ package com.digitalsolutionarchitecture.bpmnlayoutanalyzer.bpmnmodel;
 
 import java.util.ArrayList;
 import java.util.List;
+import java.util.stream.Collectors;
 
 import com.digitalsolutionarchitecture.bpmnlayoutanalyzer.util.StringUtil;
 
@@ -123,5 +124,31 @@ public class FlowNode implements RepresentedByShape {
 		if(!incomingSequenceFlows.contains(sequenceFlow)) {
 			incomingSequenceFlows.add(sequenceFlow);
 		}
+	}
+	
+	public List<Trace> getNonLoopingTracesToEnd() {
+		List<Trace> result = new ArrayList<>();
+		
+		Trace currentTrace = new Trace();
+		getNonLoopingTracesToEnd(result, currentTrace);
+		
+		return result;
+	}
+
+	private void getNonLoopingTracesToEnd(List<Trace> result, Trace currentTrace) {
+		if(outgoingSequenceFlows.size() > 0) {
+			for(FlowNode following : outgoingSequenceFlows.stream().map(x -> x.getTarget()).collect(Collectors.toList())) {
+				if(!currentTrace.contains(following)) {
+					Trace newTrace = new Trace(currentTrace);
+					newTrace.addFlowNodeToTrace(this);
+					following.getNonLoopingTracesToEnd(result, newTrace);
+				}
+			}
+		} else {
+			Trace newTrace = new Trace(currentTrace);
+			newTrace.addFlowNodeToTrace(this);
+			result.add(newTrace);
+		}
+		
 	}
 }

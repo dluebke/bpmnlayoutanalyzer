@@ -96,4 +96,5 @@ public class BpmnProcess {
 	public Participant getParticipantById(String id) {
 		return participantById.get(id);
 	}
+	
 }

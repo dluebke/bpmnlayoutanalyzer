@@ -1,10 +1,16 @@
 package com.digitalsolutionarchitecture.bpmnlayoutanalyzer.analyze.pattern;
 
+import java.util.Arrays;
+import java.util.List;
+
 import com.digitalsolutionarchitecture.bpmnlayoutanalyzer.analyze.Result;
 import com.digitalsolutionarchitecture.bpmnlayoutanalyzer.bpmnmodel.BpmnProcess;
 
 class ControlFlowPatternAnalyzerResult extends Result {
 
+	static final String[] HEADERS = new String[] {
+			"Pattern", "PatternClassification", "PatternSize"
+	};
 	private String pattern;
 	private String patternClassification;
 	private int patternSize;
@@ -26,5 +32,14 @@ class ControlFlowPatternAnalyzerResult extends Result {
 	
 	public int getPatternSize() {
 		return patternSize;
+	}
+	
+	@Override
+	public List<Object> getValues() {
+		return Arrays.asList(
+			getPattern(),
+			getPatternClassification(),
+			getPatternSize()
+		);
 	}
 }

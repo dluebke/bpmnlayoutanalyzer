@@ -8,7 +8,7 @@ import java.util.stream.Collectors;
 import com.digitalsolutionarchitecture.bpmnlayoutanalyzer.analyze.IBpmnAnalyzer;
 import com.digitalsolutionarchitecture.bpmnlayoutanalyzer.bpmnmodel.BpmnProcess;
 import com.digitalsolutionarchitecture.bpmnlayoutanalyzer.bpmnmodel.FlowNode;
-import com.digitalsolutionarchitecture.bpmnlayoutanalyzer.output.CsvWriter;
+import com.digitalsolutionarchitecture.bpmnlayoutanalyzer.output.CsvResultWriter;
 import com.digitalsolutionarchitecture.bpmnlayoutanalyzer.output.CsvWriterOptions;
 import com.digitalsolutionarchitecture.bpmnlayoutanalyzer.util.StringUtil;
 
@@ -30,7 +30,7 @@ public class ControlFlowPatternAnalyzer implements IBpmnAnalyzer {
 
 	private void identifyXorJoins(FlowNode fn, BpmnProcess p) {
 		if(fn.getIncomingSequenceFlows().size() > 1) {
-			if(fn.getType().equals("exlusiveGateway")) {
+			if(fn.getType().equals("exclusiveGateway")) {
 				results.add(new ControlFlowPatternAnalyzerResult(p, "ExplicitXorJoin", "ExclusiveGateway", fn.getIncomingSequenceFlows().size()));
 			} else if(!fn.getType().endsWith("Gateway")) {
 				results.add(new ControlFlowPatternAnalyzerResult(p, "ImplicitXorJoin", StringUtil.toFirstUpper(fn.getTypeAndEventType()), fn.getIncomingSequenceFlows().size()));
@@ -80,17 +80,9 @@ public class ControlFlowPatternAnalyzer implements IBpmnAnalyzer {
 
 	@Override
 	public void writeReport(String baseName, CsvWriterOptions options) throws IOException {
-		try(CsvWriter out = new CsvWriter(baseName + ".patterns.csv", options)) {
-			out.writeHeader("Pattern", "PatternClassification", "PatternSize");
-			
-			for(ControlFlowPatternAnalyzerResult r : results) {
-				out.writeRecord(
-					r, 
-					r.getPattern(),
-					r.getPatternClassification(),
-					r.getPatternSize()
-				);
-			}
+		try(CsvResultWriter out = new CsvResultWriter(baseName + ".patterns.csv", options)) {
+			out.writeHeader(ControlFlowPatternAnalyzerResult.HEADERS);
+			out.writeRecords(results);
 		}
 	}
 

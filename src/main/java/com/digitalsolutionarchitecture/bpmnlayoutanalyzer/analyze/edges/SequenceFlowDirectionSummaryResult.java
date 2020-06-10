@@ -76,4 +76,24 @@ class SequenceFlowDirectionSummaryResult extends Result {
 	public CounterMap<EdgeDirection> getOptimizableSequenceFlowDirections() {
 		return optimizableSequenceFlowTypes;
 	}
+	
+	@Override
+	public List<Object> getValues() {
+		List<Object> fields = new ArrayList<>();
+		
+		fields.addAll(Arrays.asList(
+			this.getDominantSequenceFlowDirection() != null ? this.getDominantSequenceFlowDirection().toString() : "", 
+			this.getDominantSequenceFlowDirectionPurity() >= 0.0 ? Double.toString(this.getDominantSequenceFlowDirectionPurity()) : ""
+		));
+		for(EdgeDirection at : EdgeDirection.values()) {
+			fields.add(this.getSequenceFlowDirections().get(at));
+		}
+		fields.add(this.getSequenceFlowDirections().sumAll());
+		for(EdgeDirection at : EdgeDirection.values()) {
+			fields.add(this.getOptimizableSequenceFlowDirections().get(at));
+		}
+		fields.add(this.getOptimizableSequenceFlowDirections().sumAll());
+			
+		return fields;
+	}
 }

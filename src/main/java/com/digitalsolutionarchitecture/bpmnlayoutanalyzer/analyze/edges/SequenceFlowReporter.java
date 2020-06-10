@@ -8,7 +8,7 @@ import com.digitalsolutionarchitecture.bpmnlayoutanalyzer.analyze.IBpmnAnalyzer;
 import com.digitalsolutionarchitecture.bpmnlayoutanalyzer.bpmnmodel.BpmnProcess;
 import com.digitalsolutionarchitecture.bpmnlayoutanalyzer.bpmnmodel.SequenceFlow;
 import com.digitalsolutionarchitecture.bpmnlayoutanalyzer.bpmnmodel.WayPoint;
-import com.digitalsolutionarchitecture.bpmnlayoutanalyzer.output.CsvWriter;
+import com.digitalsolutionarchitecture.bpmnlayoutanalyzer.output.CsvResultWriter;
 import com.digitalsolutionarchitecture.bpmnlayoutanalyzer.output.CsvWriterOptions;
 
 public class SequenceFlowReporter implements IBpmnAnalyzer {
@@ -46,14 +46,10 @@ public class SequenceFlowReporter implements IBpmnAnalyzer {
 
 	@Override
 	public void writeReport(String baseName, CsvWriterOptions options) throws IOException {
-		try(CsvWriter out = new CsvWriter(baseName + ".sequenceflows.csv", options)) {
-			out.writeHeader("Id", "SourceId", "SourceType", "TargetId", "TargetType", "WayPoints", "IsOptimizable", "Direction");
-			
-			for(SequenceFlowReportItem r : results) {
-				out.writeRecord(r, r.id, r.sourceId, r.sourceType, r.targetId, r.targetType, r.wayPoints, r.isOptimizable, r.sequenceFlowDirection);
-			}
+		try(CsvResultWriter out = new CsvResultWriter(baseName + ".sequenceflows.csv", options)) {
+			out.writeHeader(SequenceFlowReportItem.HEADERS);
+			out.writeRecords(results);
 		}
 	}
-
 
 }
