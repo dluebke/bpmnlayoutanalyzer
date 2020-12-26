@@ -1,6 +1,5 @@
 package com.digitalsolutionarchitecture.bpmnlayoutanalyzer.analyze.diagramsize;
 
-import java.io.IOException;
 import java.util.ArrayList;
 import java.util.List;
 
@@ -8,8 +7,6 @@ import com.digitalsolutionarchitecture.bpmnlayoutanalyzer.analyze.IBpmnAnalyzer;
 import com.digitalsolutionarchitecture.bpmnlayoutanalyzer.bpmnmodel.Bounds;
 import com.digitalsolutionarchitecture.bpmnlayoutanalyzer.bpmnmodel.BpmnProcess;
 import com.digitalsolutionarchitecture.bpmnlayoutanalyzer.bpmnmodel.FlowNode;
-import com.digitalsolutionarchitecture.bpmnlayoutanalyzer.output.CsvResultWriter;
-import com.digitalsolutionarchitecture.bpmnlayoutanalyzer.output.CsvWriterOptions;
 
 public class DiagramDimensionAnalyzer implements IBpmnAnalyzer {
 
@@ -35,12 +32,17 @@ public class DiagramDimensionAnalyzer implements IBpmnAnalyzer {
 	}
 
 	@Override
-	public void writeReport(String baseName, CsvWriterOptions options) throws IOException {
-		try(CsvResultWriter out = new CsvResultWriter(baseName + ".dimensions.csv", options)) {
-			out.writeHeader(DiagramDimensionResult.HEADERS);
-			
-			out.writeRecords(results);
-		}
+	public String getShortName() {
+		return "dimensions";
 	}
-
+	
+	@Override
+	public List<DiagramDimensionResult> getResults() {
+		return results;
+	}
+	
+	@Override
+	public String[] getHeaders() {
+		return DiagramDimensionResult.HEADERS;
+	}
 }

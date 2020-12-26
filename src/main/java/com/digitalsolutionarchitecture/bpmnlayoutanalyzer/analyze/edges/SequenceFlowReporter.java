@@ -1,6 +1,5 @@
 package com.digitalsolutionarchitecture.bpmnlayoutanalyzer.analyze.edges;
 
-import java.io.IOException;
 import java.util.ArrayList;
 import java.util.List;
 
@@ -8,8 +7,6 @@ import com.digitalsolutionarchitecture.bpmnlayoutanalyzer.analyze.IBpmnAnalyzer;
 import com.digitalsolutionarchitecture.bpmnlayoutanalyzer.bpmnmodel.BpmnProcess;
 import com.digitalsolutionarchitecture.bpmnlayoutanalyzer.bpmnmodel.SequenceFlow;
 import com.digitalsolutionarchitecture.bpmnlayoutanalyzer.bpmnmodel.WayPoint;
-import com.digitalsolutionarchitecture.bpmnlayoutanalyzer.output.CsvResultWriter;
-import com.digitalsolutionarchitecture.bpmnlayoutanalyzer.output.CsvWriterOptions;
 
 public class SequenceFlowReporter implements IBpmnAnalyzer {
 
@@ -45,11 +42,17 @@ public class SequenceFlowReporter implements IBpmnAnalyzer {
 	}
 
 	@Override
-	public void writeReport(String baseName, CsvWriterOptions options) throws IOException {
-		try(CsvResultWriter out = new CsvResultWriter(baseName + ".sequenceflows.csv", options)) {
-			out.writeHeader(SequenceFlowReportItem.HEADERS);
-			out.writeRecords(results);
-		}
+	public String getShortName() {
+		return "sequenceflows";
 	}
 
+	@Override
+	public List<SequenceFlowReportItem> getResults() {
+		return results;
+	}
+	
+	@Override
+	public String[] getHeaders() {
+		return SequenceFlowReportItem.HEADERS;
+	}
 }

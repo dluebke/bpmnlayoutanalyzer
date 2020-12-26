@@ -47,5 +47,9 @@ public final class Trace {
 		
 		return null;
 	}
+
+	public FlowNode last() {
+		return trace.get(trace.size() - 1);
+	}
 	
 }

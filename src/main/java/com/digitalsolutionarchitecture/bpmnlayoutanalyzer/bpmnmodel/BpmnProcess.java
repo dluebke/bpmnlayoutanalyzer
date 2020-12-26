@@ -6,6 +6,8 @@ import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 
+import org.w3c.dom.Document;
+
 import com.digitalsolutionarchitecture.bpmnlayoutanalyzer.analyze.exporter.ExporterInfo;
 
 public class BpmnProcess {
@@ -19,7 +21,13 @@ public class BpmnProcess {
 	private ExporterInfo exporterInfo;
 	private String filename;
 	private int diagramIndex;
+	private Document bpmnDocument;
 	
+	public BpmnProcess(String filename, Document bpmnDocument) {
+		this.filename = filename;
+		this.bpmnDocument = bpmnDocument;
+	}
+
 	public FlowNode getFlowNodeById(String id) {
 		return flowNodeById.get(id);
 	}
@@ -96,5 +104,20 @@ public class BpmnProcess {
 	public Participant getParticipantById(String id) {
 		return participantById.get(id);
 	}
+
+	public List<FlowNode> getStartFlowNodes() {
+		List<FlowNode> result = new ArrayList<>();
+		
+		for(FlowNode fn : flowNodes) {
+			if(fn.getIncomingSequenceFlows().size() == 0) {
+				result.add(fn);
+			}
+		}
+		
+		return result;
+	}
 	
+	public Document getBpmnDocument() {
+		return bpmnDocument;
+	}
 }

@@ -1,13 +1,10 @@
 package com.digitalsolutionarchitecture.bpmnlayoutanalyzer.analyze.modelingerror;
 
-import java.io.IOException;
 import java.util.ArrayList;
 import java.util.List;
 
 import com.digitalsolutionarchitecture.bpmnlayoutanalyzer.analyze.IBpmnAnalyzer;
 import com.digitalsolutionarchitecture.bpmnlayoutanalyzer.bpmnmodel.BpmnProcess;
-import com.digitalsolutionarchitecture.bpmnlayoutanalyzer.output.CsvResultWriter;
-import com.digitalsolutionarchitecture.bpmnlayoutanalyzer.output.CsvWriterOptions;
 
 public class JoinAndSplitAnalyzer implements IBpmnAnalyzer {
 
@@ -20,11 +17,17 @@ public class JoinAndSplitAnalyzer implements IBpmnAnalyzer {
 	}
 
 	@Override
-	public void writeReport(String baseName, CsvWriterOptions options) throws IOException {
-		try(CsvResultWriter out = new CsvResultWriter(baseName + ".wrongjoinandsplit.csv", options)) {
-			out.writeHeader(JoinAndSplitAnalyzerResult.HEADERS);
-			out.writeRecords(results );
-		}
+	public String getShortName() {
+		return "wrongjoinandsplit";
 	}
-
+	
+	@Override
+	public List<JoinAndSplitAnalyzerResult> getResults() {
+		return results;
+	}
+	
+	@Override
+	public String[] getHeaders() {
+		return JoinAndSplitAnalyzerResult.HEADERS;
+	}
 }

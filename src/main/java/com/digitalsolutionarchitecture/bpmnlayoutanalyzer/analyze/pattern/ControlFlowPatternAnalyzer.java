@@ -1,6 +1,5 @@
 package com.digitalsolutionarchitecture.bpmnlayoutanalyzer.analyze.pattern;
 
-import java.io.IOException;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.stream.Collectors;
@@ -8,8 +7,6 @@ import java.util.stream.Collectors;
 import com.digitalsolutionarchitecture.bpmnlayoutanalyzer.analyze.IBpmnAnalyzer;
 import com.digitalsolutionarchitecture.bpmnlayoutanalyzer.bpmnmodel.BpmnProcess;
 import com.digitalsolutionarchitecture.bpmnlayoutanalyzer.bpmnmodel.FlowNode;
-import com.digitalsolutionarchitecture.bpmnlayoutanalyzer.output.CsvResultWriter;
-import com.digitalsolutionarchitecture.bpmnlayoutanalyzer.output.CsvWriterOptions;
 import com.digitalsolutionarchitecture.bpmnlayoutanalyzer.util.StringUtil;
 
 public class ControlFlowPatternAnalyzer implements IBpmnAnalyzer {
@@ -79,11 +76,18 @@ public class ControlFlowPatternAnalyzer implements IBpmnAnalyzer {
 	}
 
 	@Override
-	public void writeReport(String baseName, CsvWriterOptions options) throws IOException {
-		try(CsvResultWriter out = new CsvResultWriter(baseName + ".patterns.csv", options)) {
-			out.writeHeader(ControlFlowPatternAnalyzerResult.HEADERS);
-			out.writeRecords(results);
-		}
+	public String getShortName() {
+		return "patterns";
 	}
-
+	
+	@Override
+	public List<ControlFlowPatternAnalyzerResult> getResults() {
+		return results;
+	}
+	
+	@Override
+	public String[] getHeaders() {
+		return ControlFlowPatternAnalyzerResult.HEADERS;
+	}
+	
 }
