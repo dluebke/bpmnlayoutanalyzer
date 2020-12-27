@@ -18,9 +18,67 @@ public class ConnectednessAnalyzer implements IBpmnAnalyzer {
 	public void analyze(BpmnProcess processWithDiagramData) {
 		
 		List<FlowNode> startFlowNodes = processWithDiagramData.getStartFlowNodes();
-		
-		Connectedness connectedness = startFlowNodes.size() == 1 ? Connectedness.SINGLE_PROCESS : Connectedness.MULTIPLE_PROCESSES;
+		List<Subgraph> subgraphs = calculateSubgraphs(startFlowNodes);
+		Set<FlowNode> endFlowNodes = calculateEndFlowNodes(startFlowNodes);
+		Connectedness connectedness = subgraphs.size() == 1 ? Connectedness.SINGLE_PROCESS : Connectedness.MULTIPLE_PROCESSES;
 
+		Set<StartAndEndConstellation> startAndEnds = calculateStartAndEndConstellations(startFlowNodes);
+		StartAndEndConstellation startAndEnd = startAndEnds.size() == 1 ? startAndEnds.iterator().next() : 
+			startAndEnds.contains(StartAndEndConstellation.INCORRECT) ? StartAndEndConstellation.INCORRECT : StartAndEndConstellation.SOMETIMES_EVENTS_SOMETIMES_NOEVENTS;
+		
+		int startFlowNodeCount = startFlowNodes.size();
+		int endFlowNodeCount = endFlowNodes.size();
+		int subgraphCount = subgraphs.size();
+		
+		results.add(new ConnectednessAnalyzerResult(
+			processWithDiagramData, 
+			connectedness, 
+			startAndEnd, 
+			startFlowNodeCount, 
+			endFlowNodeCount, 
+			subgraphCount
+		));
+	}
+
+	private Set<FlowNode> calculateEndFlowNodes(List<FlowNode> startFlowNodes) {
+		Set<FlowNode> result = new HashSet<>();
+		
+		for(FlowNode start : startFlowNodes) {
+			for(Trace t : start.getNonLoopingTracesToEnd()) {
+				result.add(t.last());
+			}
+		}
+		
+		return result;
+	}
+
+	private List<Subgraph> calculateSubgraphs(List<FlowNode> startFlowNodes) {
+		List<Subgraph> result = new ArrayList<>();
+		
+		for(FlowNode start : startFlowNodes) {
+			for(Trace t : start.getNonLoopingTracesToEnd()) {
+				boolean found = false;
+				for(Subgraph s : result) {
+					if(s.containsTrace(t)) {
+						s.add(t);
+						found = true;
+						break;
+					}
+				}
+				
+				if(!found) {
+					Subgraph s = new Subgraph();
+					s.add(t);
+					result.add(s);
+				}
+			}
+		}
+		
+		
+		return result;
+	}
+
+	private Set<StartAndEndConstellation> calculateStartAndEndConstellations(List<FlowNode> startFlowNodes) {
 		Set<StartAndEndConstellation> startAndEnds = new HashSet<>();
 		for(FlowNode start : startFlowNodes) {
 			if(start.getType().endsWith("startEvent")) {
@@ -37,11 +95,7 @@ public class ConnectednessAnalyzer implements IBpmnAnalyzer {
 				}
 			}
 		}
-		
-		StartAndEndConstellation startAndEnd = startAndEnds.size() == 1 ? startAndEnds.iterator().next() : 
-			startAndEnds.contains(StartAndEndConstellation.INCORRECT) ? StartAndEndConstellation.INCORRECT : StartAndEndConstellation.SOMETIMES_EVENTS_SOMETIMES_NOEVENTS;
-		
-		results.add(new ConnectednessAnalyzerResult(processWithDiagramData, connectedness, startAndEnd));
+		return startAndEnds;
 	}
 
 	private boolean isSometimesEndingInEndEvents(FlowNode start) {

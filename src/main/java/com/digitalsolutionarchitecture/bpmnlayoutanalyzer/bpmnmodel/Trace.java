@@ -51,5 +51,9 @@ public final class Trace {
 	public FlowNode last() {
 		return trace.get(trace.size() - 1);
 	}
+
+	public List<FlowNode> getFlowNodes() {
+		return trace;
+	}
 	
 }

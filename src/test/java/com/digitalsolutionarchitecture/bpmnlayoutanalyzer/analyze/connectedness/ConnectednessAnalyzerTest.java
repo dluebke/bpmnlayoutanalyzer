@@ -24,7 +24,14 @@ public class ConnectednessAnalyzerTest {
 		ConnectednessAnalyzer connectednessAnalyzer = new ConnectednessAnalyzer();
 		connectednessAnalyzer.analyze(p);
 		
-		assertResult(connectednessAnalyzer.getResults(), Connectedness.SINGLE_PROCESS, StartAndEndConstellation.EVENTS);
+		assertCorrectResult(
+			connectednessAnalyzer.getResults(), 
+			Connectedness.SINGLE_PROCESS, 
+			StartAndEndConstellation.EVENTS, 
+			1,
+			1,
+			1
+		);
 	}
 	
 
@@ -36,7 +43,14 @@ public class ConnectednessAnalyzerTest {
 		ConnectednessAnalyzer connectednessAnalyzer = new ConnectednessAnalyzer();
 		connectednessAnalyzer.analyze(p);
 		
-		assertResult(connectednessAnalyzer.getResults(), Connectedness.SINGLE_PROCESS, StartAndEndConstellation.NO_EVENTS);
+		assertCorrectResult(
+			connectednessAnalyzer.getResults(), 
+			Connectedness.SINGLE_PROCESS, 
+			StartAndEndConstellation.NO_EVENTS, 
+			1,
+			1,
+			1
+		);
 	}
 	
 	@Test
@@ -48,7 +62,14 @@ public class ConnectednessAnalyzerTest {
 		ConnectednessAnalyzer connectednessAnalyzer = new ConnectednessAnalyzer();
 		connectednessAnalyzer.analyze(p);
 
-		assertResult(connectednessAnalyzer.getResults(), Connectedness.MULTIPLE_PROCESSES, StartAndEndConstellation.EVENTS);
+		assertCorrectResult(
+			connectednessAnalyzer.getResults(), 
+			Connectedness.MULTIPLE_PROCESSES, 
+			StartAndEndConstellation.EVENTS, 
+			2,
+			2,
+			2
+		);
 	}
 	
 	@Test
@@ -60,7 +81,14 @@ public class ConnectednessAnalyzerTest {
 		ConnectednessAnalyzer connectednessAnalyzer = new ConnectednessAnalyzer();
 		connectednessAnalyzer.analyze(p);
 		
-		assertResult(connectednessAnalyzer.getResults(), Connectedness.MULTIPLE_PROCESSES, StartAndEndConstellation.NO_EVENTS);
+		assertCorrectResult(
+			connectednessAnalyzer.getResults(),
+			Connectedness.MULTIPLE_PROCESSES, 
+			StartAndEndConstellation.NO_EVENTS, 
+			2,
+			2,
+			2
+		);
 	}
 	
 	@Test
@@ -72,7 +100,33 @@ public class ConnectednessAnalyzerTest {
 		ConnectednessAnalyzer connectednessAnalyzer = new ConnectednessAnalyzer();
 		connectednessAnalyzer.analyze(p);
 		
-		assertResult(connectednessAnalyzer.getResults(), Connectedness.MULTIPLE_PROCESSES, StartAndEndConstellation.SOMETIMES_EVENTS_SOMETIMES_NOEVENTS);
+		assertCorrectResult(
+			connectednessAnalyzer.getResults(), 
+			Connectedness.MULTIPLE_PROCESSES, 
+			StartAndEndConstellation.SOMETIMES_EVENTS_SOMETIMES_NOEVENTS, 
+			2,
+			2,
+			2
+		);
+	}
+	
+	@Test
+	public void analyzes_mixed_2processes_withpools_correctly() throws Exception {
+		BpmnProcess p = reader.readProcess("src/test/resources/two-connected-mixedevents-pools.bpmn");
+		
+		layoutSetter.setLayoutData(p, 0);
+		
+		ConnectednessAnalyzer connectednessAnalyzer = new ConnectednessAnalyzer();
+		connectednessAnalyzer.analyze(p);
+		
+		assertCorrectResult(
+			connectednessAnalyzer.getResults(), 
+			Connectedness.MULTIPLE_PROCESSES, 
+			StartAndEndConstellation.SOMETIMES_EVENTS_SOMETIMES_NOEVENTS, 
+			2,
+			2,
+			2
+		);
 	}
 	
 	@Test
@@ -84,7 +138,14 @@ public class ConnectednessAnalyzerTest {
 		ConnectednessAnalyzer connectednessAnalyzer = new ConnectednessAnalyzer();
 		connectednessAnalyzer.analyze(p);
 		
-		assertResult(connectednessAnalyzer.getResults(), Connectedness.MULTIPLE_PROCESSES, StartAndEndConstellation.INCORRECT);
+		assertCorrectResult(
+			connectednessAnalyzer.getResults(), 
+			Connectedness.MULTIPLE_PROCESSES, 
+			StartAndEndConstellation.INCORRECT, 
+			2,
+			2,
+			2
+		);
 	}
 	
 	@Test
@@ -96,13 +157,58 @@ public class ConnectednessAnalyzerTest {
 		ConnectednessAnalyzer connectednessAnalyzer = new ConnectednessAnalyzer();
 		connectednessAnalyzer.analyze(p);
 		
-		assertResult(connectednessAnalyzer.getResults(), Connectedness.SINGLE_PROCESS, StartAndEndConstellation.INCORRECT);
+		assertCorrectResult(
+			connectednessAnalyzer.getResults(), 
+			Connectedness.SINGLE_PROCESS, 
+			StartAndEndConstellation.INCORRECT, 
+			1,
+			1,
+			1
+		);
+	}
+	
+	@Test
+	public void analyzes_correct_1process_multiplestartsandends_correctly() throws Exception {
+		BpmnProcess p = reader.readProcess("src/test/resources/one-connected-events-multiplestartend.bpmn");
+		
+		layoutSetter.setLayoutData(p, 0);
+		
+		ConnectednessAnalyzer connectednessAnalyzer = new ConnectednessAnalyzer();
+		connectednessAnalyzer.analyze(p);
+		
+		assertCorrectResult(
+				connectednessAnalyzer.getResults(), 
+				Connectedness.SINGLE_PROCESS, 
+				StartAndEndConstellation.EVENTS, 
+				2,
+				2,
+				1
+				);
 	}
 
-	private void assertResult(List<ConnectednessAnalyzerResult> results, Connectedness c,
-			StartAndEndConstellation e) {
+	private void assertCorrectResult(
+			List<ConnectednessAnalyzerResult> results, Connectedness c,
+			StartAndEndConstellation e,
+			int startFlowNodeCount,
+			int endFlowNodeCount,
+			int subgraphCount
+		) {
+		
+		
 		assertEquals(1, results.size());
-		assertSame(c, results.get(0).getValues().get(0));
-		assertSame(e, results.get(0).getValues().get(1));
+		ConnectednessAnalyzerResult result = results.get(0);
+		assertEquals(result.getValues().size(), ConnectednessAnalyzerResult.HEADERS.length);
+		
+		assertSame(result.getConnectedness(), result.getValues().get(0));
+		assertSame(result.getStartAndEnd(), result.getValues().get(1));
+		assertEquals(result.getStartFlowNodeCount(), result.getValues().get(2));
+		assertEquals(result.getEndFlowNodeCount(), result.getValues().get(3));
+		assertEquals(result.getSubgraphCount(), result.getValues().get(4));
+		
+		assertSame(c, result.getConnectedness());
+		assertSame(e, result.getStartAndEnd());
+		assertEquals(startFlowNodeCount, result.getStartFlowNodeCount());
+		assertEquals(endFlowNodeCount, result.getStartFlowNodeCount());
+		assertEquals(subgraphCount, result.getSubgraphCount());
 	}
 }
