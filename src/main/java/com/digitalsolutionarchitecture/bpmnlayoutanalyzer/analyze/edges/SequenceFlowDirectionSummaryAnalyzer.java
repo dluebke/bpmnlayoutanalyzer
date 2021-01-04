@@ -3,6 +3,7 @@ package com.digitalsolutionarchitecture.bpmnlayoutanalyzer.analyze.edges;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.List;
+import java.util.Map;
 
 import com.digitalsolutionarchitecture.bpmnlayoutanalyzer.analyze.IBpmnAnalyzer;
 import com.digitalsolutionarchitecture.bpmnlayoutanalyzer.bpmnmodel.BpmnProcess;
@@ -15,12 +16,15 @@ public class SequenceFlowDirectionSummaryAnalyzer implements IBpmnAnalyzer {
 	private EdgeDirectionEvaluator edgeDirectionEvaluator = new EdgeDirectionEvaluator();
 	private EdgeWaypointOptimizer edgeWaypointOptimizer = new EdgeWaypointOptimizer();
 	private List<SequenceFlowDirectionSummaryResult> results = new ArrayList<>();
+	private SequenceFlowForwardBackwardClassifier sequenceFlowClassifier = new SequenceFlowForwardBackwardClassifier();
 	
 	static {
 		List<String> headers = new ArrayList<>();
 		headers.addAll(Arrays.asList(
 			"DominantSequenceFlowDirection", 
-			"DominantSequenceFlowDirectionPurity"
+			"DominantSequenceFlowDirectionPurity",
+			"DominantSequenceFlowDirectionWithoutBackFlows", 
+			"DominantSequenceFlowDirectionPurityWithoutBackFlows"
 		));
 		for(EdgeDirection at : EdgeDirection.values()) {
 			headers.add("SEQUENCEFLOW_" + at.toString());
@@ -40,6 +44,7 @@ public class SequenceFlowDirectionSummaryAnalyzer implements IBpmnAnalyzer {
 	@Override
 	public void analyze(BpmnProcess p) {
 		SequenceFlowDirectionSummaryResult result = new SequenceFlowDirectionSummaryResult(p);
+		Map<SequenceFlow, DirectionType> directions = sequenceFlowClassifier.evaluateDirection(p);
 		
 		for(SequenceFlow sf : p.getSequenceFlows()) {
 			if(sf.hasLayoutData()) {
@@ -48,6 +53,9 @@ public class SequenceFlowDirectionSummaryAnalyzer implements IBpmnAnalyzer {
 				boolean optimized = edgeWaypointOptimizer.optimize(waypoints);
 				EdgeDirection at = edgeDirectionEvaluator.evaluateArcType(waypoints);
 				result.addSequenceFlow(at);
+				if(directions.get(sf) == DirectionType.FORWARD) {
+					result.addForwardSequenceFlow(at);
+				}
 				if(optimized) {
 					result.addOptimizableSequenceFlow(at);
 				}

@@ -17,10 +17,14 @@ public class DiagramDimensionAnalyzer implements IBpmnAnalyzer {
 	
 	@Override
 	public void analyze(BpmnProcess p) {
-		Bounds diagramBounds = new Bounds(Double.MAX_VALUE, Double.MAX_VALUE, Double.MIN_VALUE, Double.MIN_VALUE);
+		Bounds diagramBounds = null;
 		
 		for(FlowNode fn : p.getFlowNodes()) {
-			diagramBounds.extendTo(fn.getBounds());
+			if(diagramBounds == null) {
+				diagramBounds = new Bounds(fn.getBounds());
+			} else {
+				diagramBounds.extendTo(fn.getBounds());
+			}
 		}
 		
 		results.add(

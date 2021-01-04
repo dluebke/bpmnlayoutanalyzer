@@ -10,7 +10,7 @@ import com.digitalsolutionarchitecture.bpmnlayoutanalyzer.bpmnmodel.BpmnProcess;
 class DiagramDimensionResult extends Result {
 
 	static final String[] HEADERS = new String[] {
-		"MinX", "MinY", "MaxWidth", "MaxHeight"
+		"MinX", "MinY", "MaxWidth", "MaxHeight", "Area"
 	};
 
 	public DiagramDimensionResult(BpmnProcess process, Bounds bounds) {
@@ -26,7 +26,12 @@ class DiagramDimensionResult extends Result {
 			bounds.getX(), 
 			bounds.getY(), 
 			bounds.getWidth(), 
-			bounds.getHeight()
+			bounds.getHeight(),
+			bounds.getArea()
 		);
+	}
+	
+	public Bounds getBounds() {
+		return bounds;
 	}
 }

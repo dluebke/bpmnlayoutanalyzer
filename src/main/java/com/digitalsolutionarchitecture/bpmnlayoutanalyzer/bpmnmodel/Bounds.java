@@ -14,6 +14,10 @@ public class Bounds {
 		set(x, y, width, height);
 	}
 
+	public Bounds(Bounds bounds) {
+		set(bounds.x, bounds.y, bounds.width, bounds.height);
+	}
+
 	public void set(double x, double y, double width, double height) {
 		this.x = x;
 		this.y = y;
@@ -120,4 +124,8 @@ public class Bounds {
 		return Double.hashCode(x + y + width + height);
 	}
 
+	@Override
+	public String toString() {
+		return "x=" + x + ",y=" + y + ",w=" + width + ",h=" + height;
+	}
 }
