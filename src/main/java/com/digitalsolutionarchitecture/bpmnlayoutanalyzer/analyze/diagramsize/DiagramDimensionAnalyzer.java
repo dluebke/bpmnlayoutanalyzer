@@ -20,19 +20,23 @@ public class DiagramDimensionAnalyzer implements IBpmnAnalyzer {
 		Bounds diagramBounds = null;
 		
 		for(FlowNode fn : p.getFlowNodes()) {
-			if(diagramBounds == null) {
-				diagramBounds = new Bounds(fn.getBounds());
-			} else {
-				diagramBounds.extendTo(fn.getBounds());
+			if (fn.hasLayoutData()) {
+				if(diagramBounds == null) {
+					diagramBounds = new Bounds(fn.getBounds());
+				} else {
+					diagramBounds.extendTo(fn.getBounds());
+				}
 			}
 		}
 		
-		results.add(
-			new DiagramDimensionResult(
-				p,
-				diagramBounds
-			)
-		);
+		if (diagramBounds != null) {
+			results.add(
+					new DiagramDimensionResult(
+							p,
+							diagramBounds
+							)
+					);
+		}
 	}
 
 	@Override
