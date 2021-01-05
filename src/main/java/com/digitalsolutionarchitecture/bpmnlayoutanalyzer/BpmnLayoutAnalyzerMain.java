@@ -32,7 +32,7 @@ public class BpmnLayoutAnalyzerMain {
 				e.printStackTrace();
 			}
 		} else if(bpmnModelFile.isDirectory()) {
-			File[] possibleFiles = bpmnModelFile.listFiles(new FileNamePartFilter(".bpmn"));
+			File[] possibleFiles = bpmnModelFile.listFiles();
 			for(File g : possibleFiles) {
 				analyzeFileOrDirectory(anaylzer, g);
 			}
