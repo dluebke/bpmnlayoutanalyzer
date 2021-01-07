@@ -19,10 +19,12 @@ public class FlowNode implements RepresentedByShape {
 	private String eventType;
 	
 	private Bounds bounds;
+	private BpmnProcess parent;
 	
-	public FlowNode(String id, String type) {
+	public FlowNode(String id, String type, BpmnProcess parent) {
 		this.id = id;
 		this.type = type;
+		this.parent = parent;
 	}
 
 	@Override
@@ -149,6 +151,10 @@ public class FlowNode implements RepresentedByShape {
 			newTrace.addFlowNodeToTrace(this);
 			result.add(newTrace);
 		}
-		
 	}
+
+	public BpmnProcess getParent() {
+		return parent;
+	}
+	
 }

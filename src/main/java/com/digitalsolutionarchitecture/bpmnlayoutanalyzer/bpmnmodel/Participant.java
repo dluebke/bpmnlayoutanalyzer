@@ -4,10 +4,13 @@ public class Participant implements RepresentedByShape {
 	private String id;
 	private Bounds bounds;
 	private Boolean isHorizontal;
+	private BpmnProcess process;
+	private String processId;
 	
-	public Participant(String id) {
+	public Participant(String id, String processId) {
 		super();
 		this.id = id;
+		this.processId = processId;
 	}
 
 	public String getId() {
@@ -28,6 +31,9 @@ public class Participant implements RepresentedByShape {
 	public void clearLayoutData() {
 		bounds = null;
 		isHorizontal = null;
+		if(process != null) {
+			process.clearLayoutData();
+		}
 	}
 	
 	public Boolean getIsHorizontal() {
@@ -41,5 +47,17 @@ public class Participant implements RepresentedByShape {
 	@Override
 	public boolean hasLayoutData() {
 		return bounds != null;
+	}
+	
+	public BpmnProcess getProcess() {
+		return process;
+	}
+	
+	public void setProcess(BpmnProcess process) {
+		this.process = process;
+	}
+	
+	public String getProcessId() {
+		return processId;
 	}
 }

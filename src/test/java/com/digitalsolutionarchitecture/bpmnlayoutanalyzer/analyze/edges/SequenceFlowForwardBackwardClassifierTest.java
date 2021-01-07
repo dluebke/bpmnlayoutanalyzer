@@ -17,11 +17,12 @@ public class SequenceFlowForwardBackwardClassifierTest {
 	@Test
 	public void classifies_single_forward_sequence_flow() {
 		BpmnProcess p = new BpmnProcess("test.bpmn", null);
-		FlowNode n1 = new FlowNode("n1", "startEvent");
+		FlowNode n1 = new FlowNode("n1", "startEvent", p);
 		p.add(n1);
-		FlowNode n2 = new FlowNode("n2", "endEvent");
+		FlowNode n2 = new FlowNode("n2", "endEvent", p);
 		p.add(n2);
 		SequenceFlow sf1 = new SequenceFlow("sf1", n1, n2);
+		p.add(sf1);
 		
 		Map<SequenceFlow, DirectionType> result = classifier.evaluateDirection(p);
 		
@@ -32,14 +33,16 @@ public class SequenceFlowForwardBackwardClassifierTest {
 	@Test
 	public void classifies_all_forward_sequence_flows() {
 		BpmnProcess p = new BpmnProcess("test.bpmn", null);
-		FlowNode n1 = new FlowNode("n1", "startEvent");
+		FlowNode n1 = new FlowNode("n1", "startEvent", p);
 		p.add(n1);
-		FlowNode n2 = new FlowNode("n2", "serviceTask");
+		FlowNode n2 = new FlowNode("n2", "serviceTask", p);
 		p.add(n2);
-		FlowNode n3 = new FlowNode("n3", "endEvent");
+		FlowNode n3 = new FlowNode("n3", "endEvent", p);
 		p.add(n3);
 		SequenceFlow sf1 = new SequenceFlow("sf1", n1, n2);
+		p.add(sf1);
 		SequenceFlow sf2 = new SequenceFlow("sf2", n2, n3);
+		p.add(sf2);
 		
 		Map<SequenceFlow, DirectionType> result = classifier.evaluateDirection(p);
 		
@@ -51,18 +54,22 @@ public class SequenceFlowForwardBackwardClassifierTest {
 	@Test
 	public void classifies_cycle() {
 		BpmnProcess p = new BpmnProcess("test.bpmn", null);
-		FlowNode n1 = new FlowNode("n1", "startEvent");
+		FlowNode n1 = new FlowNode("n1", "startEvent", p);
 		p.add(n1);
-		FlowNode n2 = new FlowNode("n2", "serviceTask");
+		FlowNode n2 = new FlowNode("n2", "serviceTask", p);
 		p.add(n2);
-		FlowNode n3 = new FlowNode("n3", "serviceTask");
+		FlowNode n3 = new FlowNode("n3", "serviceTask", p);
 		p.add(n3);
-		FlowNode n4 = new FlowNode("n4", "endEvent");
+		FlowNode n4 = new FlowNode("n4", "endEvent", p);
 		p.add(n4);
 		SequenceFlow sf1 = new SequenceFlow("sf1", n1, n2);
+		p.add(sf1);
 		SequenceFlow sf2 = new SequenceFlow("sf2", n2, n3);
+		p.add(sf2);
 		SequenceFlow sf3 = new SequenceFlow("sf3", n3, n4);
+		p.add(sf3);
 		SequenceFlow sf4 = new SequenceFlow("sf4", n3, n2);
+		p.add(sf4);
 		
 		Map<SequenceFlow, DirectionType> result = classifier.evaluateDirection(p);
 		

@@ -4,7 +4,6 @@ import java.io.File;
 
 import com.digitalsolutionarchitecture.bpmnlayoutanalyzer.analyze.BpmnLayoutAnalyzer;
 import com.digitalsolutionarchitecture.bpmnlayoutanalyzer.output.CsvWriterOptions;
-import com.digitalsolutionarchitecture.bpmnlayoutanalyzer.util.javaio.FileNamePartFilter;
 
 public class BpmnLayoutAnalyzerMain {
 

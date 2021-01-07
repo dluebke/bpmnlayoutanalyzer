@@ -3,8 +3,11 @@ package com.digitalsolutionarchitecture.bpmnlayoutanalyzer.bpmnxml;
 import java.io.FileInputStream;
 import java.io.FileNotFoundException;
 import java.io.IOException;
+import java.io.InputStream;
 import java.io.StringReader;
+import java.util.ArrayList;
 import java.util.HashMap;
+import java.util.List;
 import java.util.Map;
 import java.util.Map.Entry;
 
@@ -29,6 +32,7 @@ import com.digitalsolutionarchitecture.bpmnlayoutanalyzer.bpmnmodel.BpmnProcess;
 import com.digitalsolutionarchitecture.bpmnlayoutanalyzer.bpmnmodel.FlowNode;
 import com.digitalsolutionarchitecture.bpmnlayoutanalyzer.bpmnmodel.Participant;
 import com.digitalsolutionarchitecture.bpmnlayoutanalyzer.bpmnmodel.SequenceFlow;
+import com.digitalsolutionarchitecture.bpmnlayoutanalyzer.bpmnmodel.SubProcess;
 
 public class BpmnReader {
 
@@ -37,7 +41,10 @@ public class BpmnReader {
 	private NamespaceContext bpmnNamespaceContext = BPMNNamespaceContext.DEFAULT;
 	private XPathExpression xpFlowNodes;
 	private XPathExpression xpSequenceFlows;
-	private XPathExpression xpParticipantIds;
+	private XPathExpression xpParticipants;
+	private XPathExpression xpProcesses;
+
+	private XPathExpression xpParticipantProcessIds;
 	
 	public BpmnReader() {
 		try {
@@ -57,9 +64,11 @@ public class BpmnReader {
 			XPath xpath = XPathFactory.newDefaultInstance().newXPath();
 			xpath.setNamespaceContext(bpmnNamespaceContext);
 			
-			xpFlowNodes = xpath.compile("//bpmn:process/*[local-name(.) != 'sequenceFlow']");
+			xpProcesses = xpath.compile("/bpmn:definitions/bpmn:process");
+			xpFlowNodes = xpath.compile("*[local-name(.) != 'sequenceFlow' and local-name(.) != 'incoming' and local-name(.) != 'outgoing' and local-name(.) != 'property' and local-name(.) != 'extensionElements']");
 			xpSequenceFlows = xpath.compile("//bpmn:sequenceFlow");
-			xpParticipantIds = xpath.compile("/bpmn:definitions/bpmn:collaboration/bpmn:participant/@id");
+			xpParticipants = xpath.compile("/bpmn:definitions/bpmn:collaboration/bpmn:participant");
+			xpParticipantProcessIds = xpath.compile("/bpmn:definitions/bpmn:collaboration/bpmn:participant/@processRef");
 		} catch(Exception e) {
 			throw new RuntimeException(e); 
 		}
@@ -67,14 +76,31 @@ public class BpmnReader {
 	
 	
 	public BpmnProcess readProcess(String filename) throws FileNotFoundException, SAXException, IOException {
+		return readProcess(filename, new FileInputStream(filename));
+	}
+	
+	public BpmnProcess readProcess(String filename, InputStream in) throws FileNotFoundException, SAXException, IOException {
 		try {
-			Document bpmnDocument = docBuilder.parse(new FileInputStream(filename));
+			Document bpmnDocument = docBuilder.parse(in);
 			
 			BpmnProcess process = new BpmnProcess(filename, bpmnDocument);
 			
-			collectAllFlowNodes(process);
-			connectFlowNodesBySequenceFlows(process);
+			List<String> processIdsForParticipants = extractProcessIdsForParticipants(bpmnDocument);
+			
+			NodeList processElements = (NodeList) xpProcesses.evaluate(bpmnDocument, XPathConstants.NODESET);
 			collectAllParticipants(process);
+			for(int i = 0; i < processElements.getLength(); i++) {
+				Element processElement = (Element)processElements.item(i);
+				String processId = processElement.getAttribute("id");
+				if(!processIdsForParticipants.contains(processId)) {
+					collectAllFlowNodes(process, processElement);
+				} else {
+					BpmnProcess participantProcess = new BpmnProcess("", null);
+					collectAllFlowNodes(participantProcess, processElement);
+					process.getParticipantByProcessId(processId).setProcess(participantProcess);
+				}
+			}
+			connectFlowNodesBySequenceFlows(process, bpmnDocument.getDocumentElement());
 			
 			return process;
 		} catch (XPathExpressionException e) {
@@ -83,57 +109,86 @@ public class BpmnReader {
 		}
 	}
 
+	private List<String> extractProcessIdsForParticipants(Document bpmnDocument) throws XPathExpressionException {
+		List<String> ids = new ArrayList<>();
+		
+		NodeList idAttributes = (NodeList)xpParticipantProcessIds.evaluate(bpmnDocument, XPathConstants.NODESET);
+		for(int i = 0; i < idAttributes.getLength(); i++) {
+			ids.add(idAttributes.item(i).getNodeValue());
+		}
+		return ids;
+	}
+
+
 	private void collectAllParticipants(BpmnProcess process) throws XPathExpressionException {
-		NodeList ids = (NodeList) xpParticipantIds.evaluate(process.getBpmnDocument(), XPathConstants.NODESET);
+		NodeList ids = (NodeList) xpParticipants.evaluate(process.getBpmnDocument(), XPathConstants.NODESET);
 		
 		for(int i = 0; i < ids.getLength(); i++) {
-			process.add(new Participant(ids.item(i).getNodeValue()));
+			Element participantElement = (Element) ids.item(i);
+			process.add(new Participant(participantElement.getAttribute("id"), participantElement.getAttribute("processRef")));
 		}
 	}
 	
-	private void connectFlowNodesBySequenceFlows(BpmnProcess process) throws XPathExpressionException {
-		NodeList sequenceFlowElements = (NodeList) xpSequenceFlows.evaluate(process.getBpmnDocument(), XPathConstants.NODESET);
+	private void connectFlowNodesBySequenceFlows(BpmnProcess process, Element processElement) throws XPathExpressionException {
+		NodeList sequenceFlowElements = (NodeList) xpSequenceFlows.evaluate(processElement, XPathConstants.NODESET);
 		for(int i = 0; i < sequenceFlowElements.getLength(); i++) {
 			Element e = (Element)sequenceFlowElements.item(i);
 			String sourceId = e.getAttribute("sourceRef");
 			String targetId = e.getAttribute("targetRef");
 			FlowNode source = process.getFlowNodeById(sourceId);
+			String sequenceFlowId = e.getAttribute("id");
+			if(source == null) {
+				throw new InvalidBpmnXml("Flow Node not found: " + sourceId + " (for source in sequence flow " + sequenceFlowId + ")");
+			}
 			FlowNode target = process.getFlowNodeById(targetId);
+			if(target == null) {
+				throw new InvalidBpmnXml("Flow Node not found: " + targetId + " (for targetin sequence flow " + sequenceFlowId + ")");
+			}
 			
-			SequenceFlow s = new SequenceFlow(e.getAttribute("id"), source, target);
-			process.add(s);
+			SequenceFlow s = new SequenceFlow(sequenceFlowId, source, target);
+			source.getParent().add(s);
 		}
 	}
 
-	private void collectAllFlowNodes(BpmnProcess process) throws XPathExpressionException {
+	private void collectAllFlowNodes(BpmnProcess process, Element processElement) throws XPathExpressionException {
 		Map<FlowNode, String> attachedToId = new HashMap<>();
 		
-		NodeList flowNodeElements = (NodeList) xpFlowNodes.evaluate(process.getBpmnDocument(), XPathConstants.NODESET);
+		NodeList flowNodeElements = (NodeList) xpFlowNodes.evaluate(processElement, XPathConstants.NODESET);
 		for(int i = 0; i < flowNodeElements.getLength(); i++) {
 			Element e = (Element)flowNodeElements.item(i);
 			String id = e.getAttribute("id");
 			String type = e.getLocalName();
-			FlowNode fn = new FlowNode(id, type);
+			FlowNode fn;
 			
-			if(e.getLocalName().equals("boundaryEvent")) {
-				String cancelActivityAttribute = e.getAttribute("cancelActivity");
-				if(cancelActivityAttribute != null && !"".equals(cancelActivityAttribute)) {
-					boolean cancelActivity = "true".equals(cancelActivityAttribute);
-					fn.setCancelActivity(cancelActivity);
+			if(e.getLocalName().equals("subProcess")) {
+				SubProcess sp = new SubProcess(id, type, process, "true".equals(e.getAttribute("triggeredByEvent")));
+				BpmnProcess subProcessProcess = new BpmnProcess("", null);
+				collectAllFlowNodes(subProcessProcess, e);
+				if(!subProcessProcess.getFlowNodes().isEmpty()) {
+					sp.setProcess(subProcessProcess);
 				}
-				
-				String attachedToRef = e.getAttribute("attachedToRef");
-				if(attachedToRef != null) {
-					attachedToId.put(fn, attachedToRef);
-				}
-			}
-			if(e.getLocalName().endsWith("Event")) {
-				NodeList children = e.getChildNodes();
-				for(int x = 0; x < children.getLength(); x++) {
-					Node n = children.item(x);
-					if(n.getNodeType() == Node.ELEMENT_NODE && n.getLocalName().endsWith("EventDefinition")) {
-						String eventType = n.getLocalName().replace("EventDefintion", "");
-						fn.setEventType(eventType);
+				fn = sp;
+			} else {
+				fn = new FlowNode(id, type, process);
+				if(e.getLocalName().equals("boundaryEvent")) {
+					String cancelActivityAttribute = e.getAttribute("cancelActivity");
+					if(cancelActivityAttribute != null && !"".equals(cancelActivityAttribute)) {
+						boolean cancelActivity = "true".equals(cancelActivityAttribute);
+						fn.setCancelActivity(cancelActivity);
+					}
+					
+					String attachedToRef = e.getAttribute("attachedToRef");
+					if(attachedToRef != null) {
+						attachedToId.put(fn, attachedToRef);
+					}
+				} else if(e.getLocalName().endsWith("Event")) {
+					NodeList children = e.getChildNodes();
+					for(int x = 0; x < children.getLength(); x++) {
+						Node n = children.item(x);
+						if(n.getNodeType() == Node.ELEMENT_NODE && n.getLocalName().endsWith("EventDefinition")) {
+							String eventType = n.getLocalName().replace("EventDefintion", "");
+							fn.setEventType(eventType);
+						}
 					}
 				}
 			}

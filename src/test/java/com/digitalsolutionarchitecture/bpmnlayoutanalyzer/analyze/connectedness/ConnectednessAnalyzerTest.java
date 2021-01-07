@@ -19,9 +19,9 @@ public class ConnectednessAnalyzerTest extends IBpmnAnalyzerTest<ConnectednessAn
 		getAnalyzer().analyze(p);
 		
 		assertCorrectResult(
-			getAnalyzer().getResults(), 
-			Connectedness.SINGLE_PROCESS, 
-			StartAndEndConstellation.EVENTS, 
+			getAnalyzer().getResults(),
+			Connectedness.SINGLE_PROCESS,
+			StartAndEndConstellation.EVENTS,
 			1,
 			1,
 			1

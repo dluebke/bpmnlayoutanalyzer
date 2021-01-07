@@ -4,6 +4,7 @@ import static org.junit.Assert.assertEquals;
 
 import java.io.FileNotFoundException;
 import java.io.IOException;
+import java.io.InputStream;
 import java.util.HashMap;
 import java.util.Map;
 
@@ -17,7 +18,6 @@ import com.digitalsolutionarchitecture.bpmnlayoutanalyzer.bpmnxml.BpmnLayoutSett
 import com.digitalsolutionarchitecture.bpmnlayoutanalyzer.bpmnxml.BpmnReader;
 
 public abstract class IBpmnAnalyzerTest<T extends IBpmnAnalyzer> {
-
 
 	protected abstract T createAnalyzer();
 	
@@ -38,6 +38,16 @@ public abstract class IBpmnAnalyzerTest<T extends IBpmnAnalyzer> {
 		this.analyzer = createAnalyzer();
 	}
 
+	public static BpmnProcess readProcess(InputStream in, String filename) throws FileNotFoundException, SAXException, IOException {
+		return readProcess(in, filename, 0);
+	}
+	
+	public static BpmnProcess readProcess(InputStream in, String filename, int diagramNo) throws FileNotFoundException, SAXException, IOException {
+		BpmnProcess process = reader.readProcess(filename, in);
+		layoutSetter.setLayoutData(process, diagramNo);
+		return process;
+	}
+	
 	public static BpmnProcess readProcess(String filename) throws FileNotFoundException, SAXException, IOException {
 		return readProcess(filename, 0);
 	}
@@ -60,18 +70,18 @@ public abstract class IBpmnAnalyzerTest<T extends IBpmnAnalyzer> {
 			
 			FlowNode startNode = flowNodes.get(startNodeId);
 			if(startNode == null) {
-				startNode = new FlowNode(startNodeId, "Task");
+				startNode = new FlowNode(startNodeId, "Task", p);
 				flowNodes.put(startNodeId, startNode);
 				p.add(startNode);
 			}
 			FlowNode endNode = flowNodes.get(endNodeId);
 			if(endNode == null) {
-				endNode = new FlowNode(endNodeId, "Task");
+				endNode = new FlowNode(endNodeId, "Task", p);
 				flowNodes.put(endNodeId, endNode);
 				p.add(endNode);
 			}
 			
-			new SequenceFlow("sf1", startNode, endNode);	
+			p.add(new SequenceFlow("sf1", startNode, endNode));	
 		}
 		
 		return p;
