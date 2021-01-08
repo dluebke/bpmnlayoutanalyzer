@@ -18,7 +18,9 @@ public class BpmnLayoutAnalyzerMain {
 			analyzeFileOrDirectory(analyzer, f);
 		}
 		
-		analyzer.writeReport(reportFile, new CsvWriterOptions());
+		CsvWriterOptions options = new CsvWriterOptions();
+		options.setEnforceSlashesAsPathSeparator(true);
+		analyzer.writeReport(reportFile, options);
 	}
 
 	private static void analyzeFileOrDirectory(BpmnLayoutAnalyzer anaylzer, File bpmnModelFile) {

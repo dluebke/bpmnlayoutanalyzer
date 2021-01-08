@@ -4,6 +4,7 @@ import java.util.ArrayList;
 import java.util.HashSet;
 import java.util.List;
 import java.util.Set;
+import java.util.stream.Collectors;
 
 import com.digitalsolutionarchitecture.bpmnlayoutanalyzer.analyze.IBpmnAnalyzer;
 import com.digitalsolutionarchitecture.bpmnlayoutanalyzer.bpmnmodel.BpmnProcess;
@@ -30,13 +31,15 @@ public class ConnectednessAnalyzer implements IBpmnAnalyzer {
 		int endFlowNodeCount = endFlowNodes.size();
 		int subgraphCount = subgraphs.size();
 		
+		String[] startFlowNodeIds = startFlowNodes.stream().map(x -> x.getId()).collect(Collectors.toList()).toArray(new String[0]);
 		results.add(new ConnectednessAnalyzerResult(
 			processWithDiagramData, 
 			connectedness, 
 			startAndEnd, 
 			startFlowNodeCount, 
 			endFlowNodeCount, 
-			subgraphCount
+			subgraphCount,
+			String.join(";", startFlowNodeIds)
 		));
 	}
 

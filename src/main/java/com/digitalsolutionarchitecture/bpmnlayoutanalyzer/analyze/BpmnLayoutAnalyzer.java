@@ -21,6 +21,7 @@ import com.digitalsolutionarchitecture.bpmnlayoutanalyzer.analyze.pools.PoolOrie
 import com.digitalsolutionarchitecture.bpmnlayoutanalyzer.bpmnmodel.BpmnProcess;
 import com.digitalsolutionarchitecture.bpmnlayoutanalyzer.bpmnxml.BpmnLayoutSetter;
 import com.digitalsolutionarchitecture.bpmnlayoutanalyzer.bpmnxml.BpmnReader;
+import com.digitalsolutionarchitecture.bpmnlayoutanalyzer.debug.AllFlowNodeTypesAnalyzer;
 import com.digitalsolutionarchitecture.bpmnlayoutanalyzer.output.CsvResultWriter;
 import com.digitalsolutionarchitecture.bpmnlayoutanalyzer.output.CsvWriterOptions;
 
@@ -33,7 +34,8 @@ public class BpmnLayoutAnalyzer {
 			new SequenceFlowReporter(),
 			new ControlFlowPatternAnalyzer(),
 			new FlowNodeCountAnalyzer(),
-			new ConnectednessAnalyzer()
+			new ConnectednessAnalyzer(),
+			new AllFlowNodeTypesAnalyzer()
 	};
 
 	private ExporterEstimator exporterEstimator = new ExporterEstimator();

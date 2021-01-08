@@ -9,12 +9,13 @@ import com.digitalsolutionarchitecture.bpmnlayoutanalyzer.bpmnmodel.BpmnProcess;
 class PoolOrientationResult extends Result {
 	
 	final static String[] HEADERS = new String[] {
-		"Horizontal", "Vertical", "Unknown"
+		"Horizontal", "Vertical", "Unknown", "LaneCount"
 	};
 	
 	private int poolOrientationUnknown;
 	private int poolOrientationVertical;
 	private int poolOrientationHorizontal;
+	private int laneCount;
 
 	public PoolOrientationResult(BpmnProcess process) {
 		super(process);
@@ -43,13 +44,22 @@ class PoolOrientationResult extends Result {
 	public int getPoolOrientationUnknown() {
 		return poolOrientationUnknown;
 	}
+
+	public int getLaneCount() {
+		return laneCount;
+	}
+
+	public void incLaneCount(int incBy) {
+		laneCount += incBy;
+	}
 	
 	@Override
 	public List<Object> getValues() {
 		return Arrays.asList(
 			getPoolOrientationHorizontal(), 
 			getPoolOrientationVertical(), 
-			getPoolOrientationUnknown()
+			getPoolOrientationUnknown(),
+			getLaneCount()
 		);
 	}
 }

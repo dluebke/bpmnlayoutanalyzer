@@ -22,6 +22,7 @@ public class BpmnProcess {
 	private int diagramIndex;
 	private Document bpmnDocument;
 	private List<SubProcess> subProcesses = new ArrayList<>();
+	private List<Lane> lanes = new ArrayList<>();
 	
 	public BpmnProcess(String filename, Document bpmnDocument) {
 		this.filename = filename;
@@ -190,5 +191,13 @@ public class BpmnProcess {
 			}
 		}
 		return null;
+	}
+	
+	public List<Lane> getLanes() {
+		return lanes;
+	}
+	
+	public void addLane(Lane l) {
+		lanes.add(l);
 	}
 }

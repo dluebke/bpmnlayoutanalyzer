@@ -6,6 +6,7 @@ public class CsvWriterOptions {
 	private String fieldSeparatorReplacement = "_";
 	private String recordSeparator = "\n";
 	private String recordSeparatorReplacement = "_";
+	private boolean enforceSlashesAsPathSeparator = false;
 
 	public String getFieldSeparator() {
 		return fieldSeparator;
@@ -39,4 +40,11 @@ public class CsvWriterOptions {
 		this.recordSeparator = recordSeparator;
 	}
 
+	public boolean shallEnforceSlashesAsPathSeparator() {
+		return enforceSlashesAsPathSeparator;
+	}
+	
+	public void setEnforceSlashesAsPathSeparator(boolean enforceSlashesAsPathSeparator) {
+		this.enforceSlashesAsPathSeparator = enforceSlashesAsPathSeparator;
+	}
 }

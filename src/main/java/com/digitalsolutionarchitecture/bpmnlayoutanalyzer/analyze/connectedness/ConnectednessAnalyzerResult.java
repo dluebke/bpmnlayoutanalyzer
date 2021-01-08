@@ -13,6 +13,7 @@ class ConnectednessAnalyzerResult extends Result {
 	private int startFlowNodeCount;
 	private int subgraphCount;
 	private int endFlowNodeCount;
+	private String startFlowNodeIds;
 	
 	public ConnectednessAnalyzerResult(
 			BpmnProcess p, 
@@ -20,7 +21,8 @@ class ConnectednessAnalyzerResult extends Result {
 			StartAndEndConstellation startAndEnd, 
 			int startFlowNodeCount, 
 			int endFlowNodeCount, 
-			int subgraphCount
+			int subgraphCount,
+			String startFlowNodeIds
 		) {
 		
 		super(p);
@@ -29,13 +31,21 @@ class ConnectednessAnalyzerResult extends Result {
 		this.startFlowNodeCount = startFlowNodeCount;
 		this.endFlowNodeCount = endFlowNodeCount;
 		this.subgraphCount = subgraphCount;
+		this.startFlowNodeIds = startFlowNodeIds;
 	}
 
-	public static final String[] HEADERS = new String[] { "Connectedness", "StartAndEnd", "StartFlowNodeCount", "EndFlowNodeCount", "SubgraphCount" };
+	public static final String[] HEADERS = new String[] { 
+		"Connectedness", 
+		"StartAndEnd", 
+		"StartFlowNodeCount", 
+		"EndFlowNodeCount", 
+		"SubgraphCount",
+		"StartFlowNodeIds"
+	};
 
 	@Override
 	public List<Object> getValues() {
-		return Arrays.asList(connectedness, startAndEnd, startFlowNodeCount, endFlowNodeCount, subgraphCount);
+		return Arrays.asList(connectedness, startAndEnd, startFlowNodeCount, endFlowNodeCount, subgraphCount, startFlowNodeIds);
 	}
 
 	public Connectedness getConnectedness() {
@@ -56,6 +66,10 @@ class ConnectednessAnalyzerResult extends Result {
 	
 	public int getSubgraphCount() {
 		return subgraphCount;
+	}
+	
+	public String getStartFlowNodeIds() {
+		return startFlowNodeIds;
 	}
 
 }

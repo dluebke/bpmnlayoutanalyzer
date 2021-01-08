@@ -16,6 +16,7 @@ public class PoolOrientationEvaluator implements IBpmnAnalyzer {
 	
 	@Override
 	public void analyze(BpmnProcess pr) {
+		
 		PoolOrientationResult result = new PoolOrientationResult(pr);
 		
 		for(Participant p : pr.getParticipants()) {
@@ -26,6 +27,10 @@ public class PoolOrientationEvaluator implements IBpmnAnalyzer {
 					result.incPoolOrientationHorizontal();
 				} else {
 					result.incPoolOrientationVertical();
+				}
+				
+				if(p.getProcess() != null) {
+					result.incLaneCount(p.getProcess().getLanes().size());
 				}
 			}
 		}

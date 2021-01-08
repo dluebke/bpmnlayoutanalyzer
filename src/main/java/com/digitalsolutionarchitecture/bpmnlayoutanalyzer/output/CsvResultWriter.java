@@ -46,11 +46,18 @@ public class CsvResultWriter implements AutoCloseable {
 		String[] allValues = new String[valuesFromResult.size() + 4];
 		
 		allValues[0] = sanitize(r.filename);
+		if(allValues[0] != null && options.shallEnforceSlashesAsPathSeparator()) {
+			allValues[0] = allValues[0].replaceAll("\\\\", "/");
+		}
 		allValues[1] = Integer.toString(r.digramIndex);
 		allValues[2] = sanitize(r.exporterInfo.getExporter());
 		allValues[3] = sanitize(r.exporterInfo.getExporterVersion());
 		for(int i = 0; i < valuesFromResult.size(); i++) {
-			allValues[i + 4] = sanitize(valuesFromResult.get(i).toString());
+			if(valuesFromResult != null && valuesFromResult.get(i) != null) {
+				allValues[i + 4] = sanitize(valuesFromResult.get(i).toString());
+			} else {
+				allValues[i + 4] = "";
+			}
 		}
 		
 		writeRecord(allValues);

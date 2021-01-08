@@ -6,6 +6,7 @@ import java.io.IOException;
 import java.io.InputStream;
 import java.io.StringReader;
 import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
@@ -30,6 +31,7 @@ import org.xml.sax.SAXException;
 
 import com.digitalsolutionarchitecture.bpmnlayoutanalyzer.bpmnmodel.BpmnProcess;
 import com.digitalsolutionarchitecture.bpmnlayoutanalyzer.bpmnmodel.FlowNode;
+import com.digitalsolutionarchitecture.bpmnlayoutanalyzer.bpmnmodel.Lane;
 import com.digitalsolutionarchitecture.bpmnlayoutanalyzer.bpmnmodel.Participant;
 import com.digitalsolutionarchitecture.bpmnlayoutanalyzer.bpmnmodel.SequenceFlow;
 import com.digitalsolutionarchitecture.bpmnlayoutanalyzer.bpmnmodel.SubProcess;
@@ -39,12 +41,24 @@ public class BpmnReader {
 	private final DocumentBuilder docBuilder;
 	
 	private NamespaceContext bpmnNamespaceContext = BPMNNamespaceContext.DEFAULT;
-	private XPathExpression xpFlowNodes;
+	private XPathExpression xpPossibleFlowNodes;
 	private XPathExpression xpSequenceFlows;
 	private XPathExpression xpParticipants;
 	private XPathExpression xpProcesses;
-
 	private XPathExpression xpParticipantProcessIds;
+	private XPathExpression xpLanes;
+	
+	private static final List<String> NO_FLOWNODE_NAMES = Arrays.asList(
+		"association",
+		"dataStoreReference",
+		"extensionElements",
+		"incoming",
+		"laneSet",
+		"outgoing",
+		"property",
+		"sequenceFlow",
+		"textAnnotation"
+	); 
 	
 	public BpmnReader() {
 		try {
@@ -65,10 +79,11 @@ public class BpmnReader {
 			xpath.setNamespaceContext(bpmnNamespaceContext);
 			
 			xpProcesses = xpath.compile("/bpmn:definitions/bpmn:process");
-			xpFlowNodes = xpath.compile("*[local-name(.) != 'sequenceFlow' and local-name(.) != 'incoming' and local-name(.) != 'outgoing' and local-name(.) != 'property' and local-name(.) != 'extensionElements']");
+			xpPossibleFlowNodes = xpath.compile("*[local-name(.) != 'sequenceFlow' and local-name(.) != 'incoming' and local-name(.) != 'outgoing' and local-name(.) != 'property' and local-name(.) != 'extensionElements']");
 			xpSequenceFlows = xpath.compile("//bpmn:sequenceFlow");
 			xpParticipants = xpath.compile("/bpmn:definitions/bpmn:collaboration/bpmn:participant");
 			xpParticipantProcessIds = xpath.compile("/bpmn:definitions/bpmn:collaboration/bpmn:participant/@processRef");
+			xpLanes = xpath.compile("bpmn:laneSet/bpmn:lane");
 		} catch(Exception e) {
 			throw new RuntimeException(e); 
 		}
@@ -93,10 +108,10 @@ public class BpmnReader {
 				Element processElement = (Element)processElements.item(i);
 				String processId = processElement.getAttribute("id");
 				if(!processIdsForParticipants.contains(processId)) {
-					collectAllFlowNodes(process, processElement);
+					collectAllFlowNodesAndLanes(process, processElement);
 				} else {
 					BpmnProcess participantProcess = new BpmnProcess("", null);
-					collectAllFlowNodes(participantProcess, processElement);
+					collectAllFlowNodesAndLanes(participantProcess, processElement);
 					process.getParticipantByProcessId(processId).setProcess(participantProcess);
 				}
 			}
@@ -150,12 +165,21 @@ public class BpmnReader {
 		}
 	}
 
-	private void collectAllFlowNodes(BpmnProcess process, Element processElement) throws XPathExpressionException {
+	private void collectAllFlowNodesAndLanes(BpmnProcess process, Element processElement) throws XPathExpressionException {
 		Map<FlowNode, String> attachedToId = new HashMap<>();
 		
-		NodeList flowNodeElements = (NodeList) xpFlowNodes.evaluate(processElement, XPathConstants.NODESET);
+		NodeList laneElements = (NodeList) xpLanes.evaluate(processElement, XPathConstants.NODESET);
+		for(int i = 0; i < laneElements.getLength(); i++) {
+			Element laneElement = (Element)laneElements.item(i);
+			process.addLane(new Lane(laneElement.getAttribute("id")));
+		}
+		
+		NodeList flowNodeElements = (NodeList) xpPossibleFlowNodes.evaluate(processElement, XPathConstants.NODESET);
 		for(int i = 0; i < flowNodeElements.getLength(); i++) {
 			Element e = (Element)flowNodeElements.item(i);
+			if(NO_FLOWNODE_NAMES.contains(e.getLocalName())) {
+				continue;
+			}
 			String id = e.getAttribute("id");
 			String type = e.getLocalName();
 			FlowNode fn;
@@ -163,7 +187,7 @@ public class BpmnReader {
 			if(e.getLocalName().equals("subProcess")) {
 				SubProcess sp = new SubProcess(id, type, process, "true".equals(e.getAttribute("triggeredByEvent")));
 				BpmnProcess subProcessProcess = new BpmnProcess("", null);
-				collectAllFlowNodes(subProcessProcess, e);
+				collectAllFlowNodesAndLanes(subProcessProcess, e);
 				if(!subProcessProcess.getFlowNodes().isEmpty()) {
 					sp.setProcess(subProcessProcess);
 				}

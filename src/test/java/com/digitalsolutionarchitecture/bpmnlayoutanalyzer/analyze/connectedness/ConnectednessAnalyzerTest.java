@@ -1,8 +1,11 @@
 package com.digitalsolutionarchitecture.bpmnlayoutanalyzer.analyze.connectedness;
 
 import static org.junit.Assert.assertEquals;
+import static org.junit.Assert.assertNotNull;
 import static org.junit.Assert.assertSame;
+import static org.junit.Assert.assertTrue;
 
+import java.util.Arrays;
 import java.util.List;
 
 import org.junit.Test;
@@ -24,7 +27,8 @@ public class ConnectednessAnalyzerTest extends IBpmnAnalyzerTest<ConnectednessAn
 			StartAndEndConstellation.EVENTS,
 			1,
 			1,
-			1
+			1,
+			Arrays.asList("StartEvent_1")
 		);
 	}
 	
@@ -41,7 +45,8 @@ public class ConnectednessAnalyzerTest extends IBpmnAnalyzerTest<ConnectednessAn
 			StartAndEndConstellation.NO_EVENTS, 
 			1,
 			1,
-			1
+			1,
+			Arrays.asList("Task_1c4ahx0")
 		);
 	}
 	
@@ -57,7 +62,8 @@ public class ConnectednessAnalyzerTest extends IBpmnAnalyzerTest<ConnectednessAn
 			StartAndEndConstellation.EVENTS, 
 			2,
 			2,
-			2
+			2,
+			Arrays.asList("StartEvent_1", "StartEvent_0brsoyu")
 		);
 	}
 	
@@ -73,7 +79,8 @@ public class ConnectednessAnalyzerTest extends IBpmnAnalyzerTest<ConnectednessAn
 			StartAndEndConstellation.NO_EVENTS, 
 			2,
 			2,
-			2
+			2,
+			Arrays.asList("Task_1c4ahx0", "Task_1r3e5r9")
 		);
 	}
 	
@@ -89,7 +96,8 @@ public class ConnectednessAnalyzerTest extends IBpmnAnalyzerTest<ConnectednessAn
 			StartAndEndConstellation.SOMETIMES_EVENTS_SOMETIMES_NOEVENTS, 
 			2,
 			2,
-			2
+			2,
+			Arrays.asList("Task_1r3e5r9", "StartEvent_1r8sdcd")
 		);
 	}
 	
@@ -105,7 +113,8 @@ public class ConnectednessAnalyzerTest extends IBpmnAnalyzerTest<ConnectednessAn
 			StartAndEndConstellation.SOMETIMES_EVENTS_SOMETIMES_NOEVENTS, 
 			2,
 			2,
-			2
+			2,
+			Arrays.asList("StartEvent_1r8sdcd", "Task_1r3e5r9")
 		);
 	}
 	
@@ -121,7 +130,8 @@ public class ConnectednessAnalyzerTest extends IBpmnAnalyzerTest<ConnectednessAn
 			StartAndEndConstellation.INCORRECT, 
 			2,
 			2,
-			2
+			2,
+			Arrays.asList("Task_0i340ps", "StartEvent_19ygu3t")
 		);
 	}
 	
@@ -137,7 +147,8 @@ public class ConnectednessAnalyzerTest extends IBpmnAnalyzerTest<ConnectednessAn
 			StartAndEndConstellation.INCORRECT, 
 			1,
 			1,
-			1
+			1,
+			Arrays.asList("Task_0i340ps")
 		);
 	}
 	
@@ -148,13 +159,14 @@ public class ConnectednessAnalyzerTest extends IBpmnAnalyzerTest<ConnectednessAn
 		getAnalyzer().analyze(p);
 		
 		assertCorrectResult(
-				getAnalyzer().getResults(), 
-				Connectedness.SINGLE_PROCESS, 
-				StartAndEndConstellation.EVENTS, 
-				2,
-				2,
-				1
-				);
+			getAnalyzer().getResults(), 
+			Connectedness.SINGLE_PROCESS, 
+			StartAndEndConstellation.EVENTS, 
+			2,
+			2,
+			1,
+			Arrays.asList("StartEvent_1", "StartEvent_1oilf57")
+		);
 	}
 
 	private void assertCorrectResult(
@@ -162,7 +174,8 @@ public class ConnectednessAnalyzerTest extends IBpmnAnalyzerTest<ConnectednessAn
 			StartAndEndConstellation e,
 			int startFlowNodeCount,
 			int endFlowNodeCount,
-			int subgraphCount
+			int subgraphCount,
+			List<String> startFlowNodeIds // null to ignore
 		) {
 		
 		assertEquals(1, results.size());
@@ -174,12 +187,23 @@ public class ConnectednessAnalyzerTest extends IBpmnAnalyzerTest<ConnectednessAn
 		assertEquals(result.getStartFlowNodeCount(), result.getValues().get(2));
 		assertEquals(result.getEndFlowNodeCount(), result.getValues().get(3));
 		assertEquals(result.getSubgraphCount(), result.getValues().get(4));
+		assertSame(result.getStartFlowNodeIds(), result.getValues().get(5));
 		
 		assertSame(c, result.getConnectedness());
 		assertSame(e, result.getStartAndEnd());
 		assertEquals(startFlowNodeCount, result.getStartFlowNodeCount());
 		assertEquals(endFlowNodeCount, result.getStartFlowNodeCount());
 		assertEquals(subgraphCount, result.getSubgraphCount());
+		
+		if(startFlowNodeIds != null) {
+			assertNotNull(result.getStartFlowNodeIds());
+			String[] actualStartFlowNodeIds = result.getStartFlowNodeIds().split(";");
+			assertEquals(startFlowNodeCount, startFlowNodeIds.size());
+			assertEquals(startFlowNodeIds.size(), actualStartFlowNodeIds.length);
+			for(String actualStartFlowNodeId : actualStartFlowNodeIds) {
+				assertTrue(actualStartFlowNodeId, startFlowNodeIds.contains(actualStartFlowNodeId));
+			}
+		}
 	}
 
 

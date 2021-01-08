@@ -15,6 +15,7 @@ import com.digitalsolutionarchitecture.bpmnlayoutanalyzer.bpmnmodel.FlowNode;
 import com.digitalsolutionarchitecture.bpmnlayoutanalyzer.bpmnmodel.Participant;
 import com.digitalsolutionarchitecture.bpmnlayoutanalyzer.bpmnmodel.SequenceFlow;
 import com.digitalsolutionarchitecture.bpmnlayoutanalyzer.bpmnmodel.WayPointList;
+import com.digitalsolutionarchitecture.bpmnlayoutanalyzer.util.StringUtil;
 
 public class BpmnLayoutSetter {
 
@@ -79,6 +80,12 @@ public class BpmnLayoutSetter {
 					Participant p = process.getParticipantById(bpmnElementId);
 					if(p != null) {
 						p.setBounds(XMLReaderHelper.convertToBounds(boundsElement));
+						String isHorizontal = shape.getAttribute("isHorizontal");
+						if(!StringUtil.isEmpty(isHorizontal)) {
+							p.setIsHorizontal("true".equals(isHorizontal));							
+						} else {
+							p.setIsHorizontal(null);
+						}
 					}
 				}
 			}
