@@ -17,9 +17,9 @@ public class SequenceFlowForwardBackwardClassifierTest {
 	@Test
 	public void classifies_single_forward_sequence_flow() {
 		BpmnProcess p = new BpmnProcess("test.bpmn", null);
-		FlowNode n1 = new FlowNode("n1", "startEvent", p);
+		FlowNode n1 = new FlowNode("n1", "startEvent", p, "n1");
 		p.add(n1);
-		FlowNode n2 = new FlowNode("n2", "endEvent", p);
+		FlowNode n2 = new FlowNode("n2", "endEvent", p, "n2");
 		p.add(n2);
 		SequenceFlow sf1 = new SequenceFlow("sf1", n1, n2);
 		p.add(sf1);
@@ -33,11 +33,11 @@ public class SequenceFlowForwardBackwardClassifierTest {
 	@Test
 	public void classifies_all_forward_sequence_flows() {
 		BpmnProcess p = new BpmnProcess("test.bpmn", null);
-		FlowNode n1 = new FlowNode("n1", "startEvent", p);
+		FlowNode n1 = new FlowNode("n1", "startEvent", p, "n1");
 		p.add(n1);
-		FlowNode n2 = new FlowNode("n2", "serviceTask", p);
+		FlowNode n2 = new FlowNode("n2", "serviceTask", p, "n2");
 		p.add(n2);
-		FlowNode n3 = new FlowNode("n3", "endEvent", p);
+		FlowNode n3 = new FlowNode("n3", "endEvent", p, "n3");
 		p.add(n3);
 		SequenceFlow sf1 = new SequenceFlow("sf1", n1, n2);
 		p.add(sf1);
@@ -54,13 +54,13 @@ public class SequenceFlowForwardBackwardClassifierTest {
 	@Test
 	public void classifies_cycle() {
 		BpmnProcess p = new BpmnProcess("test.bpmn", null);
-		FlowNode n1 = new FlowNode("n1", "startEvent", p);
+		FlowNode n1 = new FlowNode("n1", "startEvent", p, "n1");
 		p.add(n1);
-		FlowNode n2 = new FlowNode("n2", "serviceTask", p);
+		FlowNode n2 = new FlowNode("n2", "serviceTask", p, "n2");
 		p.add(n2);
-		FlowNode n3 = new FlowNode("n3", "serviceTask", p);
+		FlowNode n3 = new FlowNode("n3", "serviceTask", p, "n3");
 		p.add(n3);
-		FlowNode n4 = new FlowNode("n4", "endEvent", p);
+		FlowNode n4 = new FlowNode("n4", "endEvent", p, "n4");
 		p.add(n4);
 		SequenceFlow sf1 = new SequenceFlow("sf1", n1, n2);
 		p.add(sf1);

@@ -20,11 +20,14 @@ public final class Trace {
 			trace.add(n);
 		} else {
 			FlowNode lastNode = trace.get(trace.size() - 1);
-			List<FlowNode> nodesReachableFromLastNode = lastNode.getOutgoingSequenceFlows()
+			ArrayList<FlowNode> nodesReachableFromLastNode = new ArrayList<>();
+			nodesReachableFromLastNode.addAll(lastNode.getBoundaryEvents());
+			
+			nodesReachableFromLastNode.addAll(lastNode.getOutgoingSequenceFlows()
 				.stream()
 				.map(x -> x.getTarget())
 				.collect(Collectors.toList())
-			;
+			);
 			
 			if(nodesReachableFromLastNode.contains(n)) {
 				trace.add(n);
@@ -68,7 +71,7 @@ public final class Trace {
 			if(!fn2.hasLayoutData()) {
 				return false;
 			}
-			if(!fn1.getSequenceFlowTo(fn2).hasLayoutData()) {
+			if(fn1.getSequenceFlowTo(fn2) != null && !fn1.getSequenceFlowTo(fn2).hasLayoutData()) {
 				return false;
 			}
 		}

@@ -9,7 +9,6 @@ public class SequenceFlowTrace {
 
 	private List<SequenceFlowNode> sequenceFlows;
 	private FlowNode singleFlowNode; 
-	
 	private Layout layout;
 	
 	public SequenceFlowTrace(FlowNode singleFlowNode) {
@@ -35,5 +34,10 @@ public class SequenceFlowTrace {
 	
 	public FlowNode getSingleFlowNode() {
 		return singleFlowNode;
+	}
+	
+	@Override
+	public String toString() {
+		return sequenceFlows.toString();
 	}
 }

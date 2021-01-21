@@ -9,15 +9,15 @@ public enum Layout {
 		@Override
 		public boolean isLayout(SequenceFlowTrace trace) {
 			for(SequenceFlowNode n : trace.getSequenceFlows()) {
-				if(n.isReverseSequenceFlow()) {
-					continue;
-				} 
-				
 				EdgeDirection edgeDirection = n.getEdgeDirection();
+				if(n.isReverseSequenceFlow() || edgeDirection == EdgeDirection.BOUNDARY) {
+					continue;
+				}
+				
 				if(n.isFromSplitOrToJoin()) {
 					if(!(
 						edgeDirection.isNorthFacing() || 
-						edgeDirection.isWestFacing()
+						edgeDirection.isEastFacing()
 					)) {
 						return false;
 					}
@@ -35,13 +35,16 @@ public enum Layout {
 		@Override
 		public boolean isLayout(SequenceFlowTrace trace) {
 			for(SequenceFlowNode n : trace.getSequenceFlows()) {
-				if(n.isReverseSequenceFlow()) {
+				EdgeDirection edgeDirection = n.getEdgeDirection();
+				if(n.isReverseSequenceFlow() || edgeDirection == EdgeDirection.BOUNDARY) {
 					continue;
 				} 
 				
-				EdgeDirection edgeDirection = n.getEdgeDirection();
 				if(n.isFromSplitOrToJoin()) {
-					if(!edgeDirection.isWestFacing()) {
+					if(!(
+						edgeDirection.isNorthFacing() ||
+						edgeDirection.isWestFacing()
+					)) {
 						return false;
 					}
 				} else {
@@ -54,15 +57,68 @@ public enum Layout {
 		}
 	},
 	
-	PURE_LEFT_RIGHT {
+	DIAGONAL_SOUTH_EAST {
 		@Override
 		public boolean isLayout(SequenceFlowTrace trace) {
 			for(SequenceFlowNode n : trace.getSequenceFlows()) {
-				if(n.isReverseSequenceFlow()) {
+				EdgeDirection edgeDirection = n.getEdgeDirection();
+				if(n.isReverseSequenceFlow() || edgeDirection == EdgeDirection.BOUNDARY) {
+					continue;
+				}
+				
+				if(n.isFromSplitOrToJoin()) {
+					if(!(
+						edgeDirection.isSouthFacing() || 
+						edgeDirection.isEastFacing()
+					)) {
+						return false;
+					}
+				} else {
+					if(!edgeDirection.isSouthEastFacing()) {
+						return false;
+					}
+				}
+			}
+			return true;
+		}
+	},
+	
+	DIAGONAL_SOUTH_WEST {
+		@Override
+		public boolean isLayout(SequenceFlowTrace trace) {
+			for(SequenceFlowNode n : trace.getSequenceFlows()) {
+				EdgeDirection edgeDirection = n.getEdgeDirection();
+				if(n.isReverseSequenceFlow() || edgeDirection == EdgeDirection.BOUNDARY) {
 					continue;
 				} 
 				
+				if(n.isFromSplitOrToJoin()) {
+					if(!(
+						edgeDirection.isSouthFacing() || 
+						edgeDirection.isWestFacing()
+					)) {
+						return false;
+					}
+				} else {
+					if(!edgeDirection.isSouthWestFacing()) {
+						return false;
+					}
+				}
+			}
+			return true;
+		}
+	},
+	
+	
+	LEFT_RIGHT_PURE {
+		@Override
+		public boolean isLayout(SequenceFlowTrace trace) {
+			for(SequenceFlowNode n : trace.getSequenceFlows()) {
 				EdgeDirection edgeDirection = n.getEdgeDirection();
+				if(n.isReverseSequenceFlow() || edgeDirection == EdgeDirection.BOUNDARY) {
+					continue;
+				}
+				
 				if(n.isFromSplitOrToJoin()) {
 					if(!edgeDirection.isEastFacing()) {
 						return false;
@@ -82,11 +138,11 @@ public enum Layout {
 		public boolean isLayout(SequenceFlowTrace trace) {
 			boolean hadVerticalGatewayConncect = false;
 			for(SequenceFlowNode n : trace.getSequenceFlows()) {
-				if(n.isReverseSequenceFlow()) {
-					continue;
-				} 
-				
 				EdgeDirection edgeDirection = n.getEdgeDirection();
+				if(n.isReverseSequenceFlow() || edgeDirection == EdgeDirection.BOUNDARY) {
+					continue;
+				}
+				
 				if(n.isFromSplitOrToJoin()) {
 					if(edgeDirection.isWestFacing()) {
 						return false;
@@ -104,16 +160,16 @@ public enum Layout {
 		}
 	},
 	
-	DIRTY_LEFT_RIGHT {
+	LEFT_RIGHT_DIRTY {
 		@Override
 		public boolean isLayout(SequenceFlowTrace trace) {
 			boolean dirtyLeft = false;
 			for(SequenceFlowNode n : trace.getSequenceFlows()) {
-				if(n.isReverseSequenceFlow()) {
-					continue;
-				} 
-				
 				EdgeDirection edgeDirection = n.getEdgeDirection();
+				if(n.isReverseSequenceFlow() || edgeDirection == EdgeDirection.BOUNDARY) {
+					continue;
+				}
+				
 				if(n.isFromSplitOrToJoin()) {
 					if(edgeDirection.isWestFacing()) {
 						return false;
@@ -145,7 +201,7 @@ public enum Layout {
 		}
 	}, 
 	
-	PURE_TOP_DOWN {
+	TOP_DOWN_PURE {
 		@Override
 		public boolean isLayout(SequenceFlowTrace trace) {
 			if(trace.getSequenceFlows().size() < 1) {
@@ -153,11 +209,11 @@ public enum Layout {
 			}
 			
 			for(SequenceFlowNode n : trace.getSequenceFlows()) {
-				if(n.isReverseSequenceFlow()) {
-					continue;
-				} 
-				
 				EdgeDirection edgeDirection = n.getEdgeDirection();
+				if(n.isReverseSequenceFlow() || edgeDirection == EdgeDirection.BOUNDARY) {
+					continue;
+				}
+				
 				if(n.isFromSplitOrToJoin()) {
 					if(!edgeDirection.isSouthFacing()) {
 						return false;
@@ -177,11 +233,11 @@ public enum Layout {
 		public boolean isLayout(SequenceFlowTrace trace) {
 			boolean hadHorizontalGatewayConnect = false;
 			for(SequenceFlowNode n : trace.getSequenceFlows()) {
-				if(n.isReverseSequenceFlow()) {
-					continue;
-				} 
-				
 				EdgeDirection edgeDirection = n.getEdgeDirection();
+				if(n.isReverseSequenceFlow() || edgeDirection == EdgeDirection.BOUNDARY) {
+					continue;
+				}
+				
 				if(n.isFromSplitOrToJoin()) {
 					if(edgeDirection.isNorthFacing()) {
 						return false;
@@ -199,16 +255,16 @@ public enum Layout {
 		}
 	}, 
 	
-	DIRTY_TOP_DOWN {
+	TOP_DOWN_DIRTY {
 		@Override
 		public boolean isLayout(SequenceFlowTrace trace) {
 			boolean dirty = false;
 			for(SequenceFlowNode n : trace.getSequenceFlows()) {
-				if(n.isReverseSequenceFlow()) {
-					continue;
-				} 
-				
 				EdgeDirection edgeDirection = n.getEdgeDirection();
+				if(n.isReverseSequenceFlow() || edgeDirection == EdgeDirection.BOUNDARY) {
+					continue;
+				}
+				
 				if(n.isFromSplitOrToJoin()) {
 					if(edgeDirection.isNorthFacing()) {
 						return false;
@@ -253,7 +309,32 @@ public enum Layout {
 		public boolean isLayout(SequenceFlowTrace trace) {
 			return traceMatches(trace, "s+(e+n+e+s+)*(e+n+(e+s*)?)");
 		}
+	}, 
+	
+	EMPTY {
+		@Override
+		public boolean isLayout(SequenceFlowTrace trace) {
+			return false;
+		}
+	}, 
+	
+	SINGLE_ACTIVITY {
+		@Override
+		public boolean isLayout(SequenceFlowTrace trace) {
+			return false;
+		}
+	}, 
+	
+	BOUNDARY_EVENT {
+		@Override
+		public boolean isLayout(SequenceFlowTrace trace) {
+			return (
+				trace.getSequenceFlows().size() == 1 &&
+				trace.getSequenceFlows().get(0).getEdgeDirection().equals(EdgeDirection.BOUNDARY)
+			);
+		}
 	}
+	
 	;
 	
 	public abstract boolean isLayout(SequenceFlowTrace trace);
@@ -272,31 +353,36 @@ public enum Layout {
 			return EVENT_SUBPROCESS;
 		}
 		
-		return OTHER;
+		return SINGLE_ACTIVITY;
 	}
 
 	private static Layout evaluateTraceLayout(SequenceFlowTrace trace) {
 		Layout[] layoutsByPrecedence = new Layout[] {
-			PURE_LEFT_RIGHT,
-			PURE_TOP_DOWN,
-			LEFT_RIGHT_GATEWAY_VERTICAL_ALLOWED,
-			TOP_DOWN_GATEWAY_HORIZONTAL_ALLOWED,
-			DIRTY_LEFT_RIGHT,
-			DIRTY_TOP_DOWN,
+			BOUNDARY_EVENT,
 			DIAGONAL_NORTH_EAST,
 			DIAGONAL_NORTH_WEST,
+			DIAGONAL_SOUTH_EAST,
+			DIAGONAL_SOUTH_WEST,
+			LEFT_RIGHT_PURE,
+			TOP_DOWN_PURE,
+			LEFT_RIGHT_GATEWAY_VERTICAL_ALLOWED,
+			TOP_DOWN_GATEWAY_HORIZONTAL_ALLOWED,
+			LEFT_RIGHT_DIRTY,
+			TOP_DOWN_DIRTY,
 			MULTILINE_EAST,
 			MULTILINE_SOUTH,
 			SNAKE_EAST,
 			SNAKE_SOUTH,
+			EVENT_SUBPROCESS,
+			EMPTY,
 			OTHER,
-			EVENT_SUBPROCESS
+			SINGLE_ACTIVITY
 		};
 		if(layoutsByPrecedence.length != values().length) {
 			throw new RuntimeException("Programming Error -> please fix!");
 		}
 		
-		for(Layout l : values()) {
+		for(Layout l : layoutsByPrecedence) {
 			if(l.isLayout(trace)) {
 				return l;
 			}
@@ -321,6 +407,8 @@ public enum Layout {
 					break;
 				case DIRECT_SOUTH:
 					sb.append("s");
+					break;
+				case BOUNDARY:
 					break;
 				default:
 					sb.append("x");

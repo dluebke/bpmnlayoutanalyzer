@@ -7,18 +7,20 @@ import com.digitalsolutionarchitecture.bpmnlayoutanalyzer.util.DoubleUtil;
 
 public class EdgeDirectionEvaluator {
 
+	private double precision = 0.9;
+	
 	public EdgeDirection evaluateArcType(List<WayPoint> waypoints) {
 		WayPoint wp1 = waypoints.get(0);
 		WayPoint wpLast = waypoints.get(waypoints.size() - 1);
 		
 		String direction = null;
-		if(DoubleUtil.equals(wp1.getY(), wpLast.getY())) {
+		if(DoubleUtil.equals(wp1.getY(), wpLast.getY(), precision)) {
 			if(wp1.getX() == wpLast.getX()) {
 				direction = "ORIGIN"; // TODO Return to origin
 			} else {
 				direction =  wp1.getX() < wpLast.getX() ? "EAST" : "WEST"; 
 			}
-		} else if(DoubleUtil.equals(wp1.getX(), wpLast.getX())) {
+		} else if(DoubleUtil.equals(wp1.getX(), wpLast.getX(), precision)) {
 			direction = wp1.getY() < wpLast.getY() ? "SOUTH" : "NORTH"; 
 		} else if(wp1.getX() < wpLast.getX()) {
 			direction = wp1.getY() < wpLast.getY() ? "SOUTHEAST" : "NORTHEAST";				

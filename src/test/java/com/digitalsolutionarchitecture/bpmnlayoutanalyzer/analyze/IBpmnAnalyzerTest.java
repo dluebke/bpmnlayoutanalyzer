@@ -70,13 +70,13 @@ public abstract class IBpmnAnalyzerTest<T extends IBpmnAnalyzer> {
 			
 			FlowNode startNode = flowNodes.get(startNodeId);
 			if(startNode == null) {
-				startNode = new FlowNode(startNodeId, "Task", p);
+				startNode = new FlowNode(startNodeId, "Task", p, startNodeId);
 				flowNodes.put(startNodeId, startNode);
 				p.add(startNode);
 			}
 			FlowNode endNode = flowNodes.get(endNodeId);
 			if(endNode == null) {
-				endNode = new FlowNode(endNodeId, "Task", p);
+				endNode = new FlowNode(endNodeId, "Task", p, endNodeId);
 				flowNodes.put(endNodeId, endNode);
 				p.add(endNode);
 			}

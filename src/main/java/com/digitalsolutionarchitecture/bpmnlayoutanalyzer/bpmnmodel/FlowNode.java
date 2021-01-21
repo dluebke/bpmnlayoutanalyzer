@@ -17,11 +17,12 @@ public class FlowNode implements RepresentedByShape {
 	private FlowNode attachedTo;
 	private Boolean cancelActivity;
 	private String eventType;
+	private String name;
 	
 	private Bounds bounds;
 	private BpmnProcess parent;
 	
-	public FlowNode(String id, String type, BpmnProcess parent) {
+	public FlowNode(String id, String type, BpmnProcess parent, String name) {
 		this.id = id;
 		this.type = type;
 		this.parent = parent;
@@ -112,7 +113,7 @@ public class FlowNode implements RepresentedByShape {
 	
 	@Override
 	public String toString() {
-		return getId() + "@" + getType();
+		return getId() + "@" + getType() + (name != null && !name.equals("") ? "[@name=" + name + "]" : "");
 	}
 
 	public void addOutgoingSequenceFlow(SequenceFlow sequenceFlow) {
@@ -138,15 +139,23 @@ public class FlowNode implements RepresentedByShape {
 	}
 
 	private void getNonLoopingTracesToEnd(List<Trace> result, Trace currentTrace) {
-		if(outgoingSequenceFlows.size() > 0) {
-			for(FlowNode following : outgoingSequenceFlows.stream().map(x -> x.getTarget()).collect(Collectors.toList())) {
-				if(!currentTrace.contains(following)) {
-					Trace newTrace = new Trace(currentTrace);
-					newTrace.addFlowNodeToTrace(this);
-					following.getNonLoopingTracesToEnd(result, newTrace);
-				}
+		for(FlowNode following : outgoingSequenceFlows.stream().map(x -> x.getTarget()).collect(Collectors.toList())) {
+			if(!currentTrace.contains(following)) {
+				Trace newTrace = new Trace(currentTrace);
+				newTrace.addFlowNodeToTrace(this);
+				following.getNonLoopingTracesToEnd(result, newTrace);
 			}
-		} else {
+		}
+		
+		for(FlowNode fn : getBoundaryEvents()) {
+			if(!currentTrace.contains(fn)) {
+				Trace newTrace = new Trace(currentTrace);
+				newTrace.addFlowNodeToTrace(this);
+				fn.getNonLoopingTracesToEnd(result, newTrace);
+			}
+		}
+		
+		if(outgoingSequenceFlows.size() == 0) {
 			Trace newTrace = new Trace(currentTrace);
 			newTrace.addFlowNodeToTrace(this);
 			result.add(newTrace);
@@ -157,6 +166,10 @@ public class FlowNode implements RepresentedByShape {
 		return parent;
 	}
 
+	public String getName() {
+		return name;
+	}
+	
 	public SequenceFlow getSequenceFlowTo(FlowNode n) {
 		for(SequenceFlow sf : getOutgoingSequenceFlows()) {
 			if(sf.getTarget() == n) {

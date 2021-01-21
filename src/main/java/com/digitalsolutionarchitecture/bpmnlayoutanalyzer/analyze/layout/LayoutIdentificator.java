@@ -3,10 +3,8 @@ package com.digitalsolutionarchitecture.bpmnlayoutanalyzer.analyze.layout;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Map;
-import java.util.stream.Collectors;
 
 import com.digitalsolutionarchitecture.bpmnlayoutanalyzer.analyze.IBpmnAnalyzer;
-import com.digitalsolutionarchitecture.bpmnlayoutanalyzer.analyze.Result;
 import com.digitalsolutionarchitecture.bpmnlayoutanalyzer.analyze.edges.DirectionType;
 import com.digitalsolutionarchitecture.bpmnlayoutanalyzer.analyze.edges.EdgeDirection;
 import com.digitalsolutionarchitecture.bpmnlayoutanalyzer.analyze.edges.EdgeDirectionEvaluator;
@@ -31,8 +29,14 @@ public class LayoutIdentificator implements IBpmnAnalyzer {
 	@Override
 	public void analyze(BpmnProcess p) {
 		List<SequenceFlowTrace> traces = extractSequenceFlowTraces(p);
-		List<Layout> tracesLayouts = traces.stream().map(x -> Layout.evaluateLayout(x)).collect(Collectors.toList());
-		results.add(new LayoutIdenficatorResult(p, traceToDiagramLayoutCalulator.calculateDiagramLayout(tracesLayouts)));
+		evaluateLayoutForTraces(traces);
+		results.add(new LayoutIdenficatorResult(p, traceToDiagramLayoutCalulator.calculateDiagramLayout(traces)));
+	}
+
+	void evaluateLayoutForTraces(List<SequenceFlowTrace> traces) {
+		for(SequenceFlowTrace t : traces) {
+			t.setLayout(Layout.evaluateLayout(t));
+		}
 	}
 
 	List<SequenceFlowTrace> extractSequenceFlowTraces(BpmnProcess p) {
@@ -40,7 +44,7 @@ public class LayoutIdentificator implements IBpmnAnalyzer {
 		Map<SequenceFlow, DirectionType> directions = sequenceFlowClassifier.evaluateDirection(p);
 		
 		for(FlowNode start : p.getStartFlowNodes()) {
-			for(Trace t: start.getNonLoopingTracesToEnd()) {
+			for(Trace t : start.getNonLoopingTracesToEnd()) {
 				if(t.hasCompleteLayoutData()) {
 					if(t.getFlowNodes().size() > 1) {
 						result.add(convertToSequenceFlowTrace(t, directions));
@@ -63,12 +67,21 @@ public class LayoutIdentificator implements IBpmnAnalyzer {
 			FlowNode n2 = flowNodes.get(i + 1);
 			
 			SequenceFlow sf = n1.getSequenceFlowTo(n2);
-			List<WayPoint> waypoints = new ArrayList<>(sf.getWayPoints().getWaypoints());
-			edgeWaypointOptimizer.optimize(waypoints);
-			EdgeDirection arcType = edgeDirectionEvaluator.evaluateArcType(waypoints);
-			DirectionType directionType = directions.get(sf);
+			EdgeDirection arcType;
+			DirectionType directionType;
+			if(sf != null) {
+				List<WayPoint> waypoints = new ArrayList<>(sf.getWayPoints().getWaypoints());
+				edgeWaypointOptimizer.optimize(waypoints);
+				arcType = edgeDirectionEvaluator.evaluateArcType(waypoints);
+				directionType = directions.get(sf);
+			} else if(n2.getAttachedTo() == n1) {
+				arcType = EdgeDirection.BOUNDARY;
+				directionType = DirectionType.FORWARD;
+			} else {
+				throw new RuntimeException("Cannot find connection between " + n1 + " and " + n2);
+			}
 			
-			result.getSequenceFlows().add(new SequenceFlowNode(sf, directionType == DirectionType.BACKWARD, arcType));
+			result.getSequenceFlows().add(new SequenceFlowNode(n1, n2, directionType == DirectionType.BACKWARD, arcType));
 		}
 		
 		return result;
@@ -80,7 +93,7 @@ public class LayoutIdentificator implements IBpmnAnalyzer {
 	}
 
 	@Override
-	public List<? extends Result> getResults() {
+	public List<LayoutIdenficatorResult> getResults() {
 		return results;
 	}
 

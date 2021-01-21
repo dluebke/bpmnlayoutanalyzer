@@ -1,5 +1,6 @@
 package com.digitalsolutionarchitecture.bpmnlayoutanalyzer.analyze.edges;
 
+import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.List;
 import java.util.stream.Collectors;
@@ -41,14 +42,20 @@ public enum EdgeDirection {
 	BEND_SOUTHWEST,
 	BEND_SOUTH,
 	BEND_SOUTHEAST,
-	BEND_ORIGIN;
+	BEND_ORIGIN, 
+	
+	BOUNDARY;
 	
 	private static List<EdgeDirection> allEdgeDirectionsWith(String direction) {
-		return Arrays.asList(
+		List<EdgeDirection> result = new ArrayList<>();
+		result.addAll(Arrays.asList(
 			EdgeDirection.values()).stream().filter(
 				x -> x.name().contains(direction)  
 			).collect(Collectors.toList()
-		);
+		));
+		result.add(BOUNDARY);
+		
+		return result;
 	}
 	
 	public static final List<EdgeDirection> EAST_FACING_ARCS = allEdgeDirectionsWith("EAST");
@@ -82,5 +89,13 @@ public enum EdgeDirection {
 
 	public boolean isNorthEastFacing() {
 		return NORHTEAST_FACING_ARCS.contains(this);
+	}
+
+	public boolean isSouthWestFacing() {
+		return SOUTHWEST_FACING_ARCS.contains(this);
+	}
+
+	public boolean isSouthEastFacing() {
+		return SOUTHEAST_FACING_ARCS.contains(this);
 	}
 }

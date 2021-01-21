@@ -199,10 +199,11 @@ public class BpmnReader {
 			}
 			String id = e.getAttribute("id");
 			String type = e.getLocalName();
+			String name = e.getAttribute("name");
 			FlowNode fn;
 			
 			if(SUBPROCESS_NAMES.contains(e.getLocalName())) {
-				SubProcess sp = new SubProcess(id, type, process, "true".equals(e.getAttribute("triggeredByEvent")));
+				SubProcess sp = new SubProcess(id, type, process, name, "true".equals(e.getAttribute("triggeredByEvent")));
 				BpmnProcess subProcessProcess = new BpmnProcess("", null);
 				collectAllFlowNodesAndLanes(subProcessProcess, e);
 				if(!subProcessProcess.getFlowNodes().isEmpty()) {
@@ -210,7 +211,7 @@ public class BpmnReader {
 				}
 				fn = sp;
 			} else {
-				fn = new FlowNode(id, type, process);
+				fn = new FlowNode(id, type, process, name);
 				if(e.getLocalName().equals("boundaryEvent")) {
 					String cancelActivityAttribute = e.getAttribute("cancelActivity");
 					if(cancelActivityAttribute != null && !"".equals(cancelActivityAttribute)) {

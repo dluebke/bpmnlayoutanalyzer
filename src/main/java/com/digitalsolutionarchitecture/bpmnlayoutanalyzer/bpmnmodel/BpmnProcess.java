@@ -172,7 +172,10 @@ public class BpmnProcess {
 		List<FlowNode> result = new ArrayList<>();
 		
 		for(FlowNode fn : getFlowNodes()) {
-			if(fn.getIncomingSequenceFlows().size() == 0) {
+			if(
+				fn.getIncomingSequenceFlows().size() == 0 &&
+				!"boundaryEvent".equals(fn.getType())
+			) {
 				result.add(fn);
 			}
 		}

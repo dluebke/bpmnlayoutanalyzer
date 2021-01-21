@@ -30,7 +30,7 @@ public class LayoutTest {
 			new Object[] { "leftright-verticalgateway.bpmn", Layout.LEFT_RIGHT_GATEWAY_VERTICAL_ALLOWED, 1 },
 			new Object[] { "topdown-horizontalgateway.bpmn", Layout.TOP_DOWN_GATEWAY_HORIZONTAL_ALLOWED, 0 },
 			new Object[] { "topdown-horizontalgateway.bpmn", Layout.TOP_DOWN_GATEWAY_HORIZONTAL_ALLOWED, 1 },
-			new Object[] { "dirty-topdown.bpmn", Layout.DIRTY_TOP_DOWN, 0 },
+			new Object[] { "dirty-topdown.bpmn", Layout.TOP_DOWN_DIRTY, 0 },
 			new Object[] { "snake-east-2lines.bpmn", Layout.SNAKE_EAST, 0 },
 			new Object[] { "snake-east-3lines.bpmn", Layout.SNAKE_EAST, 0 },
 			new Object[] { "snake-east-4lines.bpmn", Layout.SNAKE_EAST, 0 },
@@ -44,27 +44,27 @@ public class LayoutTest {
 			new Object[] { "multiline-south-2lines.bpmn", Layout.MULTILINE_SOUTH, 0 },
 			new Object[] { "multiline-south-3lines.bpmn", Layout.MULTILINE_SOUTH, 0 },
 			new Object[] { "all-leftupperright.bpmn", Layout.DIAGONAL_NORTH_EAST, 0 },
-			new Object[] { "all-topbottom.bpmn", Layout.PURE_TOP_DOWN, 0 },
-			new Object[] { "eventprocesses-and-subprocesses.bpmn", Layout.PURE_LEFT_RIGHT, 0 },
+			new Object[] { "all-topbottom.bpmn", Layout.TOP_DOWN_PURE, 0 },
+			new Object[] { "eventprocesses-and-subprocesses.bpmn", Layout.LEFT_RIGHT_PURE, 0 },
 			new Object[] { "eventprocesses-and-subprocesses.bpmn", Layout.EVENT_SUBPROCESS, 1 },
 			new Object[] { "eventprocesses-and-subprocesses.bpmn", Layout.EVENT_SUBPROCESS, 2 },
 			new Object[] { "eventprocesses-and-subprocesses.bpmn", Layout.EVENT_SUBPROCESS, 3 },
-			new Object[] { "eventprocesses-and-subprocesses.bpmn", Layout.PURE_LEFT_RIGHT, 4 },
-			new Object[] { "expanded-subprocess.bpmn", Layout.PURE_LEFT_RIGHT, 0 },
-			new Object[] { "expanded-subprocess.bpmn", Layout.PURE_LEFT_RIGHT, 1 },
-			new Object[] { "one-connected-events-multiplestartend.bpmn", Layout.PURE_LEFT_RIGHT, 0 },
-			new Object[] { "one-connected-events-multiplestartend.bpmn", Layout.PURE_LEFT_RIGHT, 1 },
-			new Object[] { "one-connected-events-multiplestartend.bpmn", Layout.PURE_LEFT_RIGHT, 2 },
-			new Object[] { "one-connected-events-multiplestartend.bpmn", Layout.PURE_LEFT_RIGHT, 3 },
-			new Object[] { "simple-xor-loop.bpmn", Layout.PURE_LEFT_RIGHT, 0 },
-			new Object[] { "two-connected-mixedevents-pools.bpmn", Layout.PURE_LEFT_RIGHT, 0 },
-			new Object[] { "two-connected-mixedevents-pools.bpmn", Layout.PURE_LEFT_RIGHT, 1 },
-			new Object[] { "two-connected-mixedevents.bpmn", Layout.PURE_LEFT_RIGHT, 0 },
-			new Object[] { "two-connected-mixedevents.bpmn", Layout.PURE_LEFT_RIGHT, 1 },
-			new Object[] { "two-connected-noevents.bpmn", Layout.PURE_LEFT_RIGHT, 0 },
-			new Object[] { "two-connected-noevents.bpmn", Layout.PURE_LEFT_RIGHT, 1 },
-			new Object[] { "all-leftright.bpmn", Layout.PURE_LEFT_RIGHT, 0 },
-			new Object[] { "all-leftupperright-leftright.bpmn", Layout.DIRTY_LEFT_RIGHT, 0 }
+			new Object[] { "eventprocesses-and-subprocesses.bpmn", Layout.LEFT_RIGHT_PURE, 4 },
+			new Object[] { "expanded-subprocess.bpmn", Layout.LEFT_RIGHT_PURE, 0 },
+			new Object[] { "expanded-subprocess.bpmn", Layout.LEFT_RIGHT_PURE, 1 },
+			new Object[] { "one-connected-events-multiplestartend.bpmn", Layout.LEFT_RIGHT_PURE, 0 },
+			new Object[] { "one-connected-events-multiplestartend.bpmn", Layout.LEFT_RIGHT_PURE, 1 },
+			new Object[] { "one-connected-events-multiplestartend.bpmn", Layout.LEFT_RIGHT_PURE, 2 },
+			new Object[] { "one-connected-events-multiplestartend.bpmn", Layout.LEFT_RIGHT_PURE, 3 },
+			new Object[] { "simple-xor-loop.bpmn", Layout.LEFT_RIGHT_PURE, 0 },
+			new Object[] { "two-connected-mixedevents-pools.bpmn", Layout.LEFT_RIGHT_PURE, 0 },
+			new Object[] { "two-connected-mixedevents-pools.bpmn", Layout.LEFT_RIGHT_PURE, 1 },
+			new Object[] { "two-connected-mixedevents.bpmn", Layout.LEFT_RIGHT_PURE, 0 },
+			new Object[] { "two-connected-mixedevents.bpmn", Layout.LEFT_RIGHT_PURE, 1 },
+			new Object[] { "two-connected-noevents.bpmn", Layout.LEFT_RIGHT_PURE, 0 },
+			new Object[] { "two-connected-noevents.bpmn", Layout.LEFT_RIGHT_PURE, 1 },
+			new Object[] { "all-leftright.bpmn", Layout.LEFT_RIGHT_PURE, 0 },
+			new Object[] { "all-leftupperright-leftright.bpmn", Layout.LEFT_RIGHT_DIRTY, 0 }
 		);
 	}
 
@@ -83,5 +83,4 @@ public class LayoutTest {
 
 		assertEquals(filename, expectedLayout, Layout.evaluateLayout(trace));
 	}
-
 }
