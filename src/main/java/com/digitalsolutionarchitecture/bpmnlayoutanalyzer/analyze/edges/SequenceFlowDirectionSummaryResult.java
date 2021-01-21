@@ -28,31 +28,31 @@ class SequenceFlowDirectionSummaryResult extends Result {
 	}
 
 	private void calculcateAllSequenceFlows() {
-		int leftright = sequenceFlowTypes.sum(EdgeDirection.LEFT_RIGHT_FACING_ARCS);
-		int rightleft = sequenceFlowTypes.sum(EdgeDirection.RIGHT_LEFT_FACING_ARCS);
-		int topbottom = sequenceFlowTypes.sum(EdgeDirection.TOP_BOTTOM_FACING_ARCS);
-		int bottomtop = sequenceFlowTypes.sum(EdgeDirection.BOTTOM_TOP_FACING_ARCS);
+		int leftright = sequenceFlowTypes.sum(EdgeDirection.EAST_FACING_ARCS);
+		int rightleft = sequenceFlowTypes.sum(EdgeDirection.WEST_FACING_ARCS);
+		int topbottom = sequenceFlowTypes.sum(EdgeDirection.SOUTH_FACING_ARCS);
+		int bottomtop = sequenceFlowTypes.sum(EdgeDirection.NORTH_FACING_ARCS);
 		
 		List<EdgeDirection> remainingArcTypes = new ArrayList<>(Arrays.asList(EdgeDirection.values()));
 		
 		if(leftright > rightleft && leftright > topbottom && leftright > bottomtop) {
-			dominantSequenceFlowDirection = EdgeDirection.DIRECT_LEFT_RIGHT;
-			remainingArcTypes.removeAll(Arrays.asList(EdgeDirection.LEFT_RIGHT_FACING_ARCS));
+			dominantSequenceFlowDirection = EdgeDirection.DIRECT_EAST;
+			remainingArcTypes.removeAll(EdgeDirection.EAST_FACING_ARCS);
 			int otherArcs = sequenceFlowTypes.sum(remainingArcTypes.toArray(new EdgeDirection[remainingArcTypes.size()]));
 			dominantSequenceFlowDirectionPurity = (double)leftright / (double)(leftright + otherArcs);
 		} else if(rightleft > leftright && rightleft > topbottom && rightleft > bottomtop) {
-			dominantSequenceFlowDirection = EdgeDirection.DIRECT_RIGHT_LEFT;
-			remainingArcTypes.removeAll(Arrays.asList(EdgeDirection.RIGHT_LEFT_FACING_ARCS));
+			dominantSequenceFlowDirection = EdgeDirection.DIRECT_WEST;
+			remainingArcTypes.removeAll(EdgeDirection.WEST_FACING_ARCS);
 			int otherArcs = sequenceFlowTypes.sum(remainingArcTypes.toArray(new EdgeDirection[remainingArcTypes.size()]));
 			dominantSequenceFlowDirectionPurity = (double)rightleft / (double)(rightleft + otherArcs);
 		} else if(topbottom > leftright && topbottom > rightleft && topbottom > bottomtop) {
-			dominantSequenceFlowDirection = EdgeDirection.DIRECT_TOP_BOTTOM;
-			remainingArcTypes.removeAll(Arrays.asList(EdgeDirection.TOP_BOTTOM_FACING_ARCS));
+			dominantSequenceFlowDirection = EdgeDirection.DIRECT_SOUTH;
+			remainingArcTypes.removeAll(EdgeDirection.SOUTH_FACING_ARCS);
 			int otherArcs = sequenceFlowTypes.sum(remainingArcTypes.toArray(new EdgeDirection[remainingArcTypes.size()]));
 			dominantSequenceFlowDirectionPurity = (double)topbottom / (double)(topbottom + otherArcs);
 		} else if(bottomtop > leftright && bottomtop > rightleft && bottomtop > topbottom) {
-			dominantSequenceFlowDirection = EdgeDirection.DIRECT_BOTTOM_TOP;
-			remainingArcTypes.removeAll(Arrays.asList(EdgeDirection.BOTTOM_TOP_FACING_ARCS));
+			dominantSequenceFlowDirection = EdgeDirection.DIRECT_NORTH;
+			remainingArcTypes.removeAll(EdgeDirection.NORTH_FACING_ARCS);
 			int otherArcs = sequenceFlowTypes.sum(remainingArcTypes.toArray(new EdgeDirection[remainingArcTypes.size()]));
 			dominantSequenceFlowDirectionPurity = (double)bottomtop / (double)(bottomtop + otherArcs);
 		} else {
@@ -62,31 +62,31 @@ class SequenceFlowDirectionSummaryResult extends Result {
 	}
 	
 	private void calculcateForwardSequenceFlows() {
-		int leftright = forwardSequenceFlowTypes.sum(EdgeDirection.LEFT_RIGHT_FACING_ARCS);
-		int rightleft = forwardSequenceFlowTypes.sum(EdgeDirection.RIGHT_LEFT_FACING_ARCS);
-		int topbottom = forwardSequenceFlowTypes.sum(EdgeDirection.TOP_BOTTOM_FACING_ARCS);
-		int bottomtop = forwardSequenceFlowTypes.sum(EdgeDirection.BOTTOM_TOP_FACING_ARCS);
+		int leftright = forwardSequenceFlowTypes.sum(EdgeDirection.EAST_FACING_ARCS);
+		int rightleft = forwardSequenceFlowTypes.sum(EdgeDirection.WEST_FACING_ARCS);
+		int topbottom = forwardSequenceFlowTypes.sum(EdgeDirection.SOUTH_FACING_ARCS);
+		int bottomtop = forwardSequenceFlowTypes.sum(EdgeDirection.NORTH_FACING_ARCS);
 		
 		List<EdgeDirection> remainingArcTypes = new ArrayList<>(Arrays.asList(EdgeDirection.values()));
 		
 		if(leftright > rightleft && leftright > topbottom && leftright > bottomtop) {
-			dominantForwardSequenceFlowDirection = EdgeDirection.DIRECT_LEFT_RIGHT;
-			remainingArcTypes.removeAll(Arrays.asList(EdgeDirection.LEFT_RIGHT_FACING_ARCS));
+			dominantForwardSequenceFlowDirection = EdgeDirection.DIRECT_EAST;
+			remainingArcTypes.removeAll(EdgeDirection.EAST_FACING_ARCS);
 			int otherArcs = forwardSequenceFlowTypes.sum(remainingArcTypes.toArray(new EdgeDirection[remainingArcTypes.size()]));
 			dominantForwardSequenceFlowDirectionPurity = (double)leftright / (double)(leftright + otherArcs);
 		} else if(rightleft > leftright && rightleft > topbottom && rightleft > bottomtop) {
-			dominantForwardSequenceFlowDirection = EdgeDirection.DIRECT_RIGHT_LEFT;
-			remainingArcTypes.removeAll(Arrays.asList(EdgeDirection.RIGHT_LEFT_FACING_ARCS));
+			dominantForwardSequenceFlowDirection = EdgeDirection.DIRECT_WEST;
+			remainingArcTypes.removeAll(EdgeDirection.WEST_FACING_ARCS);
 			int otherArcs = forwardSequenceFlowTypes.sum(remainingArcTypes.toArray(new EdgeDirection[remainingArcTypes.size()]));
 			dominantForwardSequenceFlowDirectionPurity = (double)rightleft / (double)(rightleft + otherArcs);
 		} else if(topbottom > leftright && topbottom > rightleft && topbottom > bottomtop) {
-			dominantForwardSequenceFlowDirection = EdgeDirection.DIRECT_TOP_BOTTOM;
-			remainingArcTypes.removeAll(Arrays.asList(EdgeDirection.TOP_BOTTOM_FACING_ARCS));
+			dominantForwardSequenceFlowDirection = EdgeDirection.DIRECT_SOUTH;
+			remainingArcTypes.removeAll(EdgeDirection.SOUTH_FACING_ARCS);
 			int otherArcs = forwardSequenceFlowTypes.sum(remainingArcTypes.toArray(new EdgeDirection[remainingArcTypes.size()]));
 			dominantForwardSequenceFlowDirectionPurity = (double)topbottom / (double)(topbottom + otherArcs);
 		} else if(bottomtop > leftright && bottomtop > rightleft && bottomtop > topbottom) {
-			dominantForwardSequenceFlowDirection = EdgeDirection.DIRECT_BOTTOM_TOP;
-			remainingArcTypes.removeAll(Arrays.asList(EdgeDirection.BOTTOM_TOP_FACING_ARCS));
+			dominantForwardSequenceFlowDirection = EdgeDirection.DIRECT_NORTH;
+			remainingArcTypes.removeAll(EdgeDirection.NORTH_FACING_ARCS);
 			int otherArcs = forwardSequenceFlowTypes.sum(remainingArcTypes.toArray(new EdgeDirection[remainingArcTypes.size()]));
 			dominantForwardSequenceFlowDirectionPurity = (double)bottomtop / (double)(bottomtop + otherArcs);
 		} else {

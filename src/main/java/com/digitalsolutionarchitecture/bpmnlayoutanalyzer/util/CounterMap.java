@@ -1,6 +1,7 @@
 package com.digitalsolutionarchitecture.bpmnlayoutanalyzer.util;
 
 import java.util.HashMap;
+import java.util.List;
 import java.util.Map;
 import java.util.Set;
 
@@ -29,6 +30,16 @@ public class CounterMap<K> {
 	}
 
 	public int sum(@SuppressWarnings("unchecked") K... keys) {
+		int result = 0;
+		
+		for(K key : keys) {
+			result += get(key);
+		}
+		
+		return result;
+	}
+	
+	public int sum(List<K> keys) {
 		int result = 0;
 		
 		for(K key : keys) {

@@ -13,31 +13,17 @@ public class EdgeDirectionEvaluator {
 		
 		String direction = null;
 		if(DoubleUtil.equals(wp1.getY(), wpLast.getY())) {
-			if(wp1.getX() < wpLast.getX()) {
-				direction = "LEFT_RIGHT";				
-			} else if(wp1.getX() > wpLast.getX()) {
-				direction = "RIGHT_LEFT"; 
-			} else {
+			if(wp1.getX() == wpLast.getX()) {
 				direction = "ORIGIN"; // TODO Return to origin
+			} else {
+				direction =  wp1.getX() < wpLast.getX() ? "EAST" : "WEST"; 
 			}
 		} else if(DoubleUtil.equals(wp1.getX(), wpLast.getX())) {
-			if(wp1.getY() < wpLast.getY()) {
-				direction = "TOP_BOTTOM";				
-			} else if(wp1.getY() > wpLast.getY()) {
-				direction = "BOTTOM_TOP"; 
-			}
+			direction = wp1.getY() < wpLast.getY() ? "SOUTH" : "NORTH"; 
 		} else if(wp1.getX() < wpLast.getX()) {
-			if(wp1.getY() < wpLast.getY()) {
-				direction = "LEFT_LOWERRIGHT";
-			} else {
-				direction = "LEFT_UPPERRIGHT";				
-			}
+			direction = wp1.getY() < wpLast.getY() ? "SOUTHEAST" : "NORTHEAST";				
 		} else {
-			if(wp1.getY() < wpLast.getY()) {
-				direction = "RIGHT_LOWERLEFT";
-			} else {
-				direction = "RIGHT_UPPERLEFT";				
-			}
+			direction =  wp1.getY() < wpLast.getY() ? "SOUTHWEST" : "NORTHWEST";				
 		}
 		
 		if(waypoints.size() == 2) {

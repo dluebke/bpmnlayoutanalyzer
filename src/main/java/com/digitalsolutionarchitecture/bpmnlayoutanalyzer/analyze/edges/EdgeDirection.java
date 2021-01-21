@@ -1,101 +1,86 @@
 package com.digitalsolutionarchitecture.bpmnlayoutanalyzer.analyze.edges;
 
+import java.util.Arrays;
+import java.util.List;
+import java.util.stream.Collectors;
+
 public enum EdgeDirection {
 	
-	DIRECT_LEFT_RIGHT,
-	DIRECT_LEFT_UPPERRIGHT,
-	DIRECT_BOTTOM_TOP,
-	DIRECT_RIGHT_UPPERLEFT,
-	DIRECT_RIGHT_LEFT,
-	DIRECT_RIGHT_LOWERLEFT,
-	DIRECT_TOP_BOTTOM,
-	DIRECT_LEFT_LOWERRIGHT,
+	DIRECT_EAST,
+	DIRECT_NORTHEAST,
+	DIRECT_NORTH,
+	DIRECT_NORTHWEST,
+	DIRECT_WEST,
+	DIRECT_SOUTHWEST,
+	DIRECT_SOUTH,
+	DIRECT_SOUTHEAST,
 	
-	PERPENDICULAR_LEFT_RIGHT,
-	PERPENDICULAR_LEFT_UPPERRIGHT,
-	PERPENDICULAR_BOTTOM_TOP,
-	PERPENDICULAR_RIGHT_UPPERLEFT,
-	PERPENDICULAR_RIGHT_LEFT,
-	PERPENDICULAR_RIGHT_LOWERLEFT,
-	PERPENDICULAR_TOP_BOTTOM,
-	PERPENDICULAR_LEFT_LOWERRIGHT,
+	PERPENDICULAR_EAST,
+	PERPENDICULAR_NORTHEAST,
+	PERPENDICULAR_NORTH,
+	PERPENDICULAR_NORTHWEST,
+	PERPENDICULAR_WEST,
+	PERPENDICULAR_SOUTHWEST,
+	PERPENDICULAR_SOUTH,
+	PERPENDICULAR_SOUTHEAST,
 	
-	ZAGGED_LEFT_RIGHT,
-	ZAGGED_LEFT_UPPERRIGHT,
-	ZAGGED_BOTTOM_TOP,
-	ZAGGED_RIGHT_UPPERLEFT,
-	ZAGGED_RIGHT_LEFT,
-	ZAGGED_RIGHT_LOWERLEFT,
-	ZAGGED_TOP_BOTTOM,
-	ZAGGED_LEFT_LOWERRIGHT,
+	ZAGGED_EAST,
+	ZAGGED_NORTHEAST,
+	ZAGGED_NORTH,
+	ZAGGED_NORTHWEST,
+	ZAGGED_WEST,
+	ZAGGED_SOUTHWEST,
+	ZAGGED_SOUTH,
+	ZAGGED_SOUTHEAST,
 	
-	BEND_LEFT_RIGHT,
-	BEND_LEFT_UPPERRIGHT,
-	BEND_BOTTOM_TOP,
-	BEND_RIGHT_UPPERLEFT,
-	BEND_RIGHT_LEFT,
-	BEND_RIGHT_LOWERLEFT,
-	BEND_TOP_BOTTOM,
-	BEND_LEFT_LOWERRIGHT,
+	BEND_EAST,
+	BEND_NORTHEAST,
+	BEND_NORTH,
+	BEND_NORTHWEST,
+	BEND_WEST,
+	BEND_SOUTHWEST,
+	BEND_SOUTH,
+	BEND_SOUTHEAST,
 	BEND_ORIGIN;
 	
-	public static final EdgeDirection[] LEFT_RIGHT_FACING_ARCS = new EdgeDirection[] { 
-		EdgeDirection.BEND_LEFT_LOWERRIGHT, 
-		EdgeDirection.BEND_LEFT_RIGHT, 
-		EdgeDirection.BEND_LEFT_UPPERRIGHT, 
-		EdgeDirection.DIRECT_LEFT_LOWERRIGHT,
-		EdgeDirection.DIRECT_LEFT_RIGHT,
-		EdgeDirection.DIRECT_LEFT_UPPERRIGHT,
-		EdgeDirection.PERPENDICULAR_LEFT_LOWERRIGHT,
-		EdgeDirection.PERPENDICULAR_LEFT_UPPERRIGHT,
-		EdgeDirection.PERPENDICULAR_LEFT_RIGHT,
-		EdgeDirection.ZAGGED_LEFT_LOWERRIGHT,
-		EdgeDirection.ZAGGED_LEFT_UPPERRIGHT,
-		EdgeDirection.ZAGGED_LEFT_RIGHT
-	};
+	private static List<EdgeDirection> allEdgeDirectionsWith(String direction) {
+		return Arrays.asList(
+			EdgeDirection.values()).stream().filter(
+				x -> x.name().contains(direction)  
+			).collect(Collectors.toList()
+		);
+	}
 	
-	public static final EdgeDirection[] RIGHT_LEFT_FACING_ARCS = new EdgeDirection[] {
-		EdgeDirection.BEND_RIGHT_LEFT,
-		EdgeDirection.BEND_RIGHT_LOWERLEFT,
-		EdgeDirection.BEND_RIGHT_UPPERLEFT,
-		EdgeDirection.DIRECT_RIGHT_LEFT,
-		EdgeDirection.DIRECT_RIGHT_LOWERLEFT,
-		EdgeDirection.DIRECT_RIGHT_UPPERLEFT,
-		EdgeDirection.PERPENDICULAR_RIGHT_LEFT,
-		EdgeDirection.PERPENDICULAR_RIGHT_LOWERLEFT,
-		EdgeDirection.PERPENDICULAR_RIGHT_UPPERLEFT,
-		EdgeDirection.ZAGGED_RIGHT_LEFT,
-		EdgeDirection.ZAGGED_RIGHT_LOWERLEFT,
-		EdgeDirection.ZAGGED_RIGHT_UPPERLEFT
-	};
+	public static final List<EdgeDirection> EAST_FACING_ARCS = allEdgeDirectionsWith("EAST");
+	public static final List<EdgeDirection> WEST_FACING_ARCS = allEdgeDirectionsWith("WEST");
+	public static final List<EdgeDirection> SOUTH_FACING_ARCS = allEdgeDirectionsWith("SOUTH");
+	public static final List<EdgeDirection> NORTH_FACING_ARCS = allEdgeDirectionsWith("NORTH");
+	public static final List<EdgeDirection> NORHTWEST_FACING_ARCS = allEdgeDirectionsWith("NORTHWEST");
+	public static final List<EdgeDirection> SOUTHWEST_FACING_ARCS = allEdgeDirectionsWith("SOUTHWEST");
+	public static final List<EdgeDirection> NORHTEAST_FACING_ARCS = allEdgeDirectionsWith("NORTHEAST");
+	public static final List<EdgeDirection> SOUTHEAST_FACING_ARCS = allEdgeDirectionsWith("SOUTHEST");
 	
-	public static final EdgeDirection[] TOP_BOTTOM_FACING_ARCS = new EdgeDirection[] {
-		EdgeDirection.BEND_LEFT_LOWERRIGHT,
-		EdgeDirection.BEND_RIGHT_LOWERLEFT,
-		EdgeDirection.BEND_TOP_BOTTOM,
-		EdgeDirection.DIRECT_LEFT_LOWERRIGHT,
-		EdgeDirection.DIRECT_RIGHT_LOWERLEFT,
-		EdgeDirection.DIRECT_TOP_BOTTOM,
-		EdgeDirection.PERPENDICULAR_LEFT_LOWERRIGHT,
-		EdgeDirection.PERPENDICULAR_RIGHT_LOWERLEFT,
-		EdgeDirection.PERPENDICULAR_TOP_BOTTOM,
-		EdgeDirection.ZAGGED_LEFT_LOWERRIGHT,
-		EdgeDirection.ZAGGED_RIGHT_LOWERLEFT,
-		EdgeDirection.ZAGGED_TOP_BOTTOM
-	};
+	public boolean isEastFacing() {
+		return EAST_FACING_ARCS.contains(this);
+	}
+	
+	public boolean isWestFacing() {
+		return WEST_FACING_ARCS.contains(this);
+	}
+	
+	public boolean isSouthFacing() {
+		return SOUTH_FACING_ARCS.contains(this);
+	}
+	
+	public boolean isNorthFacing() {
+		return NORTH_FACING_ARCS.contains(this);
+	}
+	
+	public boolean isNorthWestFacing() {
+		return NORHTWEST_FACING_ARCS.contains(this);
+	}
 
-	public static final EdgeDirection[] BOTTOM_TOP_FACING_ARCS = new EdgeDirection[] {
-		EdgeDirection.BEND_LEFT_UPPERRIGHT,
-		EdgeDirection.BEND_RIGHT_UPPERLEFT,
-		EdgeDirection.BEND_BOTTOM_TOP,
-		EdgeDirection.DIRECT_LEFT_UPPERRIGHT,
-		EdgeDirection.DIRECT_RIGHT_UPPERLEFT,
-		EdgeDirection.DIRECT_BOTTOM_TOP,
-		EdgeDirection.PERPENDICULAR_LEFT_UPPERRIGHT,
-		EdgeDirection.PERPENDICULAR_RIGHT_UPPERLEFT,
-		EdgeDirection.PERPENDICULAR_BOTTOM_TOP,
-		EdgeDirection.ZAGGED_LEFT_UPPERRIGHT,
-		EdgeDirection.ZAGGED_RIGHT_UPPERLEFT,
-		EdgeDirection.ZAGGED_BOTTOM_TOP
-	};
+	public boolean isNorthEastFacing() {
+		return NORHTEAST_FACING_ARCS.contains(this);
+	}
 }

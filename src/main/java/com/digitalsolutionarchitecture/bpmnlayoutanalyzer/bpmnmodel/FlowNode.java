@@ -156,5 +156,14 @@ public class FlowNode implements RepresentedByShape {
 	public BpmnProcess getParent() {
 		return parent;
 	}
+
+	public SequenceFlow getSequenceFlowTo(FlowNode n) {
+		for(SequenceFlow sf : getOutgoingSequenceFlows()) {
+			if(sf.getTarget() == n) {
+				return sf;
+			}
+		}
+		return null;
+	}
 	
 }

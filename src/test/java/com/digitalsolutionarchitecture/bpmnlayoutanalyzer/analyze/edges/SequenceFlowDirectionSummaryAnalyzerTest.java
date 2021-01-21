@@ -24,9 +24,9 @@ public class SequenceFlowDirectionSummaryAnalyzerTest extends IBpmnAnalyzerTest<
 		
 		assertResult(
 			getAnalyzer().getResults(),
-			EdgeDirection.DIRECT_LEFT_RIGHT,
+			EdgeDirection.DIRECT_EAST,
 			1.0,
-			EdgeDirection.DIRECT_LEFT_RIGHT,
+			EdgeDirection.DIRECT_EAST,
 			1.0
 		);
 	}
@@ -39,9 +39,9 @@ public class SequenceFlowDirectionSummaryAnalyzerTest extends IBpmnAnalyzerTest<
 		
 		assertResult(
 				getAnalyzer().getResults(),
-				EdgeDirection.DIRECT_TOP_BOTTOM,
+				EdgeDirection.DIRECT_SOUTH,
 				1.0,
-				EdgeDirection.DIRECT_TOP_BOTTOM,
+				EdgeDirection.DIRECT_SOUTH,
 				1.0
 				);
 	}
@@ -54,9 +54,9 @@ public class SequenceFlowDirectionSummaryAnalyzerTest extends IBpmnAnalyzerTest<
 		
 		assertResult(
 				getAnalyzer().getResults(),
-				EdgeDirection.DIRECT_LEFT_RIGHT,
+				EdgeDirection.DIRECT_EAST,
 				1.0,
-				EdgeDirection.DIRECT_LEFT_RIGHT,
+				EdgeDirection.DIRECT_EAST,
 				0.8
 				);
 	}

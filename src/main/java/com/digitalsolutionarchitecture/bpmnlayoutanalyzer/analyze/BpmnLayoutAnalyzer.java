@@ -16,6 +16,7 @@ import com.digitalsolutionarchitecture.bpmnlayoutanalyzer.analyze.edges.Sequence
 import com.digitalsolutionarchitecture.bpmnlayoutanalyzer.analyze.edges.SequenceFlowReporter;
 import com.digitalsolutionarchitecture.bpmnlayoutanalyzer.analyze.exporter.ExporterEstimator;
 import com.digitalsolutionarchitecture.bpmnlayoutanalyzer.analyze.flownodecount.FlowNodeCountAnalyzer;
+import com.digitalsolutionarchitecture.bpmnlayoutanalyzer.analyze.layout.LayoutIdentificator;
 import com.digitalsolutionarchitecture.bpmnlayoutanalyzer.analyze.pattern.ControlFlowPatternAnalyzer;
 import com.digitalsolutionarchitecture.bpmnlayoutanalyzer.analyze.pools.PoolOrientationEvaluator;
 import com.digitalsolutionarchitecture.bpmnlayoutanalyzer.bpmnmodel.BpmnProcess;
@@ -35,7 +36,8 @@ public class BpmnLayoutAnalyzer {
 			new ControlFlowPatternAnalyzer(),
 			new FlowNodeCountAnalyzer(),
 			new ConnectednessAnalyzer(),
-			new AllFlowNodeTypesAnalyzer()
+			new AllFlowNodeTypesAnalyzer(),
+			new LayoutIdentificator()
 	};
 
 	private ExporterEstimator exporterEstimator = new ExporterEstimator();

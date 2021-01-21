@@ -65,9 +65,9 @@ public class ExporterEstimator {
 			}
 			
 			if("http://bpmn.io/schema/bpmn".equals(targetNamespace)) {
-				return new ExporterInfo("bpmn.io?");
+				return new ExporterInfo("bpmn.io");
 			} else if(targetNamespace.startsWith("http://www.trisotech.com/")) {
-				return new ExporterInfo("Trisotech Workflow Modeler?");
+				return new ExporterInfo("Trisotech Workflow Modeler");
 			} else if(targetNamespace.startsWith("http://activiti.org")) {
 				return ACTIVITI;
 			}

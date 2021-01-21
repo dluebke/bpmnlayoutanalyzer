@@ -55,5 +55,25 @@ public final class Trace {
 	public List<FlowNode> getFlowNodes() {
 		return trace;
 	}
+
+	public boolean hasCompleteLayoutData() {
+		if(!trace.get(0).hasLayoutData()) {
+			return false;
+		}
+		
+		for(int i = 0; i < trace.size() - 1; i++) {
+			FlowNode fn1 = trace.get(i);
+			FlowNode fn2 = trace.get(i + 1);
+			
+			if(!fn2.hasLayoutData()) {
+				return false;
+			}
+			if(!fn1.getSequenceFlowTo(fn2).hasLayoutData()) {
+				return false;
+			}
+		}
+		
+		return true;
+	}
 	
 }

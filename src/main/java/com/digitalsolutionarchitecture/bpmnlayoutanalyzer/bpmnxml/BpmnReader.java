@@ -47,17 +47,34 @@ public class BpmnReader {
 	private XPathExpression xpProcesses;
 	private XPathExpression xpParticipantProcessIds;
 	private XPathExpression xpLanes;
+
+	private static final List<String> SUBPROCESS_NAMES = Arrays.asList(
+		"subProcess",
+		"subChoreography",
+		"transaction"
+	);
 	
 	private static final List<String> NO_FLOWNODE_NAMES = Arrays.asList(
 		"association",
+		"dataInputAssociation",
 		"dataStoreReference",
+		"dataObject",
+		"dataObjectReference",
+		"dataOutputAssociation",
+		"documentation",
 		"extensionElements",
+		"group",
 		"incoming",
+		"ioSpecification",
+		"lane",
 		"laneSet",
+		"multiInstanceLoopCharacteristics",
 		"outgoing",
 		"property",
 		"sequenceFlow",
-		"textAnnotation"
+		"standardLoopCharacteristics",
+		"textAnnotation",
+		"timerEventDefinition"
 	); 
 	
 	public BpmnReader() {
@@ -184,7 +201,7 @@ public class BpmnReader {
 			String type = e.getLocalName();
 			FlowNode fn;
 			
-			if(e.getLocalName().equals("subProcess")) {
+			if(SUBPROCESS_NAMES.contains(e.getLocalName())) {
 				SubProcess sp = new SubProcess(id, type, process, "true".equals(e.getAttribute("triggeredByEvent")));
 				BpmnProcess subProcessProcess = new BpmnProcess("", null);
 				collectAllFlowNodesAndLanes(subProcessProcess, e);
