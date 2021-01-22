@@ -37,7 +37,7 @@ public class BpmnLayoutAnalyzer {
 			new SequenceFlowReporter(),
 			new ControlFlowPatternAnalyzer(),
 			new FlowNodeCountAnalyzer(),
-			new ConnectednessAnalyzer(MAX_TRACE_SEARCH_DEPTH),
+			new ConnectednessAnalyzer(),
 			new AllFlowNodeTypesAnalyzer(),
 			new LayoutIdentificator(MAX_TRACE_SEARCH_DEPTH)
 	};

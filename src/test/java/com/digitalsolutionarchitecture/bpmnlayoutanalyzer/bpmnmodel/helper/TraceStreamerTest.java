@@ -6,6 +6,7 @@ import java.io.FileWriter;
 import java.io.IOException;
 import java.util.List;
 
+import org.junit.Ignore;
 import org.junit.Test;
 
 import com.digitalsolutionarchitecture.bpmnlayoutanalyzer.analyze.IBpmnAnalyzerTest;
@@ -56,6 +57,7 @@ public class TraceStreamerTest {
 	}
 	
 	@Test
+	@Ignore
 	public void testLargeModel() throws Exception {
 		BpmnProcess p = IBpmnAnalyzerTest.readProcess("E:\\sync\\research-processes-danieldaniel-data\\repos_bpmn\\ajvarela-empiricalsoftware\\empiricalsoftware-master\\Resources\\clustersAGFeatures\\ERP\\BPMN\\cluster0.bpmn");
 		
