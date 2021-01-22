@@ -65,7 +65,7 @@ public enum EdgeDirection {
 	public static final List<EdgeDirection> NORHTWEST_FACING_ARCS = allEdgeDirectionsWith("NORTHWEST");
 	public static final List<EdgeDirection> SOUTHWEST_FACING_ARCS = allEdgeDirectionsWith("SOUTHWEST");
 	public static final List<EdgeDirection> NORHTEAST_FACING_ARCS = allEdgeDirectionsWith("NORTHEAST");
-	public static final List<EdgeDirection> SOUTHEAST_FACING_ARCS = allEdgeDirectionsWith("SOUTHEST");
+	public static final List<EdgeDirection> SOUTHEAST_FACING_ARCS = allEdgeDirectionsWith("SOUTHEAST");
 	
 	public boolean isEastFacing() {
 		return EAST_FACING_ARCS.contains(this);

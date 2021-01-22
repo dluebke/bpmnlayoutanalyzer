@@ -5,7 +5,7 @@ import com.digitalsolutionarchitecture.bpmnlayoutanalyzer.bpmnmodel.FlowNode;
 
 public enum Layout {
 
-	DIAGONAL_NORTH_EAST {
+	DIAGONAL_NORTH_EAST(true, false, false, true) {
 		@Override
 		public boolean isLayout(SequenceFlowTrace trace) {
 			for(SequenceFlowNode n : trace.getSequenceFlows()) {
@@ -31,7 +31,7 @@ public enum Layout {
 		}
 	},
 	
-	DIAGONAL_NORTH_WEST {
+	DIAGONAL_NORTH_WEST(true, false, true, false) {
 		@Override
 		public boolean isLayout(SequenceFlowTrace trace) {
 			for(SequenceFlowNode n : trace.getSequenceFlows()) {
@@ -57,7 +57,7 @@ public enum Layout {
 		}
 	},
 	
-	DIAGONAL_SOUTH_EAST {
+	DIAGONAL_SOUTH_EAST(false, true, false, true) {
 		@Override
 		public boolean isLayout(SequenceFlowTrace trace) {
 			for(SequenceFlowNode n : trace.getSequenceFlows()) {
@@ -83,7 +83,7 @@ public enum Layout {
 		}
 	},
 	
-	DIAGONAL_SOUTH_WEST {
+	DIAGONAL_SOUTH_WEST(false, true, true, false) {
 		@Override
 		public boolean isLayout(SequenceFlowTrace trace) {
 			for(SequenceFlowNode n : trace.getSequenceFlows()) {
@@ -110,7 +110,7 @@ public enum Layout {
 	},
 	
 	
-	LEFT_RIGHT_PURE {
+	LEFT_RIGHT_PURE(false, false, false, true) {
 		@Override
 		public boolean isLayout(SequenceFlowTrace trace) {
 			for(SequenceFlowNode n : trace.getSequenceFlows()) {
@@ -133,7 +133,7 @@ public enum Layout {
 		}
 	},
 	
-	LEFT_RIGHT_GATEWAY_VERTICAL_ALLOWED {
+	LEFT_RIGHT_GATEWAY_VERTICAL_ALLOWED(false, false, false, true) {
 		@Override
 		public boolean isLayout(SequenceFlowTrace trace) {
 			boolean hadVerticalGatewayConncect = false;
@@ -160,7 +160,7 @@ public enum Layout {
 		}
 	},
 	
-	LEFT_RIGHT_DIRTY {
+	LEFT_RIGHT_DIRTY(false, false, false, true) {
 		@Override
 		public boolean isLayout(SequenceFlowTrace trace) {
 			boolean dirtyLeft = false;
@@ -187,21 +187,21 @@ public enum Layout {
 		}
 	},
 	
-	EVENT_SUBPROCESS {
+	EVENT_SUBPROCESS(true, true, true, true) {
 		@Override
 		public boolean isLayout(SequenceFlowTrace trace) {
 			return false;
 		}
 	},
 	
-	OTHER {
+	OTHER(false, false, false, false) {
 		@Override
 		public boolean isLayout(SequenceFlowTrace trace) {
 			return false;
 		}
 	}, 
 	
-	TOP_DOWN_PURE {
+	TOP_DOWN_PURE(false, true, false, false) {
 		@Override
 		public boolean isLayout(SequenceFlowTrace trace) {
 			if(trace.getSequenceFlows().size() < 1) {
@@ -228,7 +228,7 @@ public enum Layout {
 		}
 	},
 	
-	TOP_DOWN_GATEWAY_HORIZONTAL_ALLOWED {
+	TOP_DOWN_GATEWAY_HORIZONTAL_ALLOWED(false, true, false, false) {
 		@Override
 		public boolean isLayout(SequenceFlowTrace trace) {
 			boolean hadHorizontalGatewayConnect = false;
@@ -255,7 +255,7 @@ public enum Layout {
 		}
 	}, 
 	
-	TOP_DOWN_DIRTY {
+	TOP_DOWN_DIRTY(false, true, false, false) {
 		@Override
 		public boolean isLayout(SequenceFlowTrace trace) {
 			boolean dirty = false;
@@ -282,14 +282,14 @@ public enum Layout {
 		}
 	},
 	
-	MULTILINE_EAST {
+	MULTILINE_EAST(false, false, false, true) {
 		@Override
 		public boolean isLayout(SequenceFlowTrace trace) {
 			return traceMatches(trace, "e+(xe*)*");
 		}
 	},
 	
-	MULTILINE_SOUTH {
+	MULTILINE_SOUTH(false, true, false, false) {
 		@Override
 		public boolean isLayout(SequenceFlowTrace trace) {
 			return traceMatches(trace, "s+(xs*)*");
@@ -297,35 +297,35 @@ public enum Layout {
 		
 	},
 	
-	SNAKE_EAST {
+	SNAKE_EAST(false, false, false, true) {
 		@Override
 		public boolean isLayout(SequenceFlowTrace trace) {
 			return traceMatches(trace, "e+(s+w+s+e+)*(s+w+(s+e*)?)");
 		}
 	},
 	
-	SNAKE_SOUTH {
+	SNAKE_SOUTH(false, true, false, false) {
 		@Override
 		public boolean isLayout(SequenceFlowTrace trace) {
 			return traceMatches(trace, "s+(e+n+e+s+)*(e+n+(e+s*)?)");
 		}
 	}, 
 	
-	EMPTY {
+	EMPTY(false, false, false, false) {
 		@Override
 		public boolean isLayout(SequenceFlowTrace trace) {
 			return false;
 		}
 	}, 
 	
-	SINGLE_ACTIVITY {
+	SINGLE_ACTIVITY(true, true, true, true) {
 		@Override
 		public boolean isLayout(SequenceFlowTrace trace) {
 			return false;
 		}
 	}, 
 	
-	BOUNDARY_EVENT {
+	BOUNDARY_EVENT(false, false, false, false) {
 		@Override
 		public boolean isLayout(SequenceFlowTrace trace) {
 			return (
@@ -333,9 +333,50 @@ public enum Layout {
 				trace.getSequenceFlows().get(0).getEdgeDirection().equals(EdgeDirection.BOUNDARY)
 			);
 		}
-	}
+	},
+	
+	SOMEHOW_EAST(false, false, false, true) {
+		@Override
+		public boolean isLayout(SequenceFlowTrace trace) {
+			return false;
+		}
+	},
+	
+	SOMEHOW_WEST(false, false, true, false) {
+		@Override
+		public boolean isLayout(SequenceFlowTrace trace) {
+			return false;
+		}
+	},
+	
+	SOMEHOW_NORTH(true, false, false, false) {
+		@Override
+		public boolean isLayout(SequenceFlowTrace trace) {
+			return false;
+		}
+	},
+	
+	SOMEHOW_SOUTH(false, true, false, false) {
+		@Override
+		public boolean isLayout(SequenceFlowTrace trace) {
+			return false;
+		}
+	},
+	
 	
 	;
+	
+	private boolean isEast;
+	private boolean isWest;
+	private boolean isSouth;
+	private boolean isNorth;
+
+	Layout(boolean isNorth, boolean isSouth, boolean isWest, boolean isEast) {
+		this.isNorth = isNorth;
+		this.isSouth = isSouth;
+		this.isWest = isWest;
+		this.isEast = isEast;
+	}
 	
 	public abstract boolean isLayout(SequenceFlowTrace trace);
 
@@ -356,8 +397,8 @@ public enum Layout {
 		return SINGLE_ACTIVITY;
 	}
 
-	private static Layout evaluateTraceLayout(SequenceFlowTrace trace) {
-		Layout[] layoutsByPrecedence = new Layout[] {
+	private static final Layout[] LAYOUTS_BY_PRECEDENCE = new Layout[] {
+			EMPTY,
 			BOUNDARY_EVENT,
 			DIAGONAL_NORTH_EAST,
 			DIAGONAL_NORTH_WEST,
@@ -374,15 +415,21 @@ public enum Layout {
 			SNAKE_EAST,
 			SNAKE_SOUTH,
 			EVENT_SUBPROCESS,
-			EMPTY,
 			OTHER,
-			SINGLE_ACTIVITY
+			SINGLE_ACTIVITY,
+			SOMEHOW_EAST,
+			SOMEHOW_NORTH,
+			SOMEHOW_SOUTH,
+			SOMEHOW_WEST
 		};
-		if(layoutsByPrecedence.length != values().length) {
+	
+	private static Layout evaluateTraceLayout(SequenceFlowTrace trace) {
+		
+		if(LAYOUTS_BY_PRECEDENCE.length != values().length) {
 			throw new RuntimeException("Programming Error -> please fix!");
 		}
 		
-		for(Layout l : layoutsByPrecedence) {
+		for(Layout l : LAYOUTS_BY_PRECEDENCE) {
 			if(l.isLayout(trace)) {
 				return l;
 			}
@@ -421,5 +468,21 @@ public enum Layout {
 	
 	private static boolean traceMatches(SequenceFlowTrace trace, String regex) {
 		return encodeWithOutSplitsAndJoins(trace).matches("^" + regex + "$");
+	}
+	
+	public boolean isEast() {
+		return isEast;
+	}
+	
+	public boolean isWest() {
+		return isWest;
+	}
+	
+	public boolean isNorth() {
+		return isNorth;
+	}
+	
+	public boolean isSouth() {
+		return isSouth;
 	}
 }

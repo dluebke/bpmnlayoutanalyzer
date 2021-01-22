@@ -18,7 +18,7 @@ import com.digitalsolutionarchitecture.bpmnlayoutanalyzer.bpmnmodel.WayPoint;
 
 public class LayoutIdentificator implements IBpmnAnalyzer {
 
-	private static final String[] HEADERS = new String[] { "Layout" };
+	private static final String[] HEADERS = new String[] { "Layout", "TraceLayouts" };
 	
 	private List<LayoutIdenficatorResult> results = new ArrayList<>();
 	private EdgeDirectionEvaluator edgeDirectionEvaluator = new EdgeDirectionEvaluator();
@@ -30,7 +30,11 @@ public class LayoutIdentificator implements IBpmnAnalyzer {
 	public void analyze(BpmnProcess p) {
 		List<SequenceFlowTrace> traces = extractSequenceFlowTraces(p);
 		evaluateLayoutForTraces(traces);
-		results.add(new LayoutIdenficatorResult(p, traceToDiagramLayoutCalulator.calculateDiagramLayout(traces)));
+		results.add(new LayoutIdenficatorResult(
+			p, 
+			traceToDiagramLayoutCalulator.calculateDiagramLayout(traces),
+			traces
+		));
 	}
 
 	void evaluateLayoutForTraces(List<SequenceFlowTrace> traces) {

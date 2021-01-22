@@ -4,6 +4,7 @@ import static org.junit.Assert.*;
 
 import java.util.List;
 
+import org.junit.Ignore;
 import org.junit.Test;
 
 import com.digitalsolutionarchitecture.bpmnlayoutanalyzer.analyze.IBpmnAnalyzerTest;
@@ -18,14 +19,15 @@ public class LayoutIdentificatorTest extends IBpmnAnalyzerTest<LayoutIdentificat
 	}
 	
 	@Test
+	@Ignore
 	public void test() throws Exception {
-		BpmnProcess p = readProcess("E:\\sync\\dluebke-research\\projects\\XXXX BPMNGithub\\bpmns-stefanko\\other\\align-elements.bpmn");
+		BpmnProcess p = readProcess("E:\\sync\\dluebke-research\\projects\\XXXX BPMNGithub\\bpmns-stefanko\\bpmns-stefanko\\align-elements.bpmn");
 		
 		assertAllBoundaryEventsAreAttached(p);
 		
 		getAnalyzer().analyze(p);
 		
-		// TODO DL assertLayout(Layout.LEFT_RIGHT_PURE);
+		assertLayout(Layout.DIAGONAL_SOUTH_EAST);
 		
 	}
 

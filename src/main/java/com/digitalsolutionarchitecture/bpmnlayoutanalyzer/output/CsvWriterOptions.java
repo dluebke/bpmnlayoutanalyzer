@@ -3,9 +3,9 @@ package com.digitalsolutionarchitecture.bpmnlayoutanalyzer.output;
 public class CsvWriterOptions {
 
 	private String fieldSeparator = ",";
-	private String fieldSeparatorReplacement = "_";
+	private String fieldSeparatorReplacement = ";";
 	private String recordSeparator = "\n";
-	private String recordSeparatorReplacement = "_";
+	private String recordSeparatorReplacement = "\\n";
 	private boolean enforceSlashesAsPathSeparator = false;
 
 	public String getFieldSeparator() {
