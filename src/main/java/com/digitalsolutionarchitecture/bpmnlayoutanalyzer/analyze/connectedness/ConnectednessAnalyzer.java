@@ -10,10 +10,22 @@ import com.digitalsolutionarchitecture.bpmnlayoutanalyzer.analyze.IBpmnAnalyzer;
 import com.digitalsolutionarchitecture.bpmnlayoutanalyzer.bpmnmodel.BpmnProcess;
 import com.digitalsolutionarchitecture.bpmnlayoutanalyzer.bpmnmodel.FlowNode;
 import com.digitalsolutionarchitecture.bpmnlayoutanalyzer.bpmnmodel.Trace;
+import com.digitalsolutionarchitecture.bpmnlayoutanalyzer.bpmnmodel.helper.MaxTracesReceiver;
+import com.digitalsolutionarchitecture.bpmnlayoutanalyzer.bpmnmodel.helper.TraceStreamer;
 
 public class ConnectednessAnalyzer implements IBpmnAnalyzer {
 
 	private List<ConnectednessAnalyzerResult> results = new ArrayList<>();
+	private TraceStreamer traceStreamer = new TraceStreamer();
+	private int traceSearchDepth;
+
+	public ConnectednessAnalyzer() {
+		this(1000000);
+	}
+	
+	public ConnectednessAnalyzer(int traceSearchDepth) {
+		this.traceSearchDepth = traceSearchDepth;
+	}
 
 	@Override
 	public void analyze(BpmnProcess processWithDiagramData) {
@@ -44,39 +56,48 @@ public class ConnectednessAnalyzer implements IBpmnAnalyzer {
 	}
 
 	private Set<FlowNode> calculateEndFlowNodes(List<FlowNode> startFlowNodes) {
-		Set<FlowNode> result = new HashSet<>();
+		final Set<FlowNode> result = new HashSet<>();
 		
 		for(FlowNode start : startFlowNodes) {
-			for(Trace t : start.getNonLoopingTracesToEnd()) {
-				result.add(t.last());
-			}
+			traceStreamer.streamNonLoopingTracesToEnd(start, new MaxTracesReceiver(traceSearchDepth) {
+				
+				@Override
+				public boolean nextTraceImpl(FlowNode start, Trace t) {
+					result.add(t.last());
+					return true;
+				}
+			});
 		}
 		
 		return result;
 	}
 
 	private List<Subgraph> calculateSubgraphs(List<FlowNode> startFlowNodes) {
-		List<Subgraph> result = new ArrayList<>();
+		final List<Subgraph> result = new ArrayList<>();
 		
 		for(FlowNode start : startFlowNodes) {
-			for(Trace t : start.getNonLoopingTracesToEnd()) {
-				boolean found = false;
-				for(Subgraph s : result) {
-					if(s.containsTrace(t)) {
-						s.add(t);
-						found = true;
-						break;
-					}
-				}
+			traceStreamer.streamNonLoopingTracesToEnd(start, new MaxTracesReceiver(traceSearchDepth) {
 				
-				if(!found) {
-					Subgraph s = new Subgraph();
-					s.add(t);
-					result.add(s);
+				@Override
+				public boolean nextTraceImpl(FlowNode start, Trace t) {
+					boolean found = false;
+					for(Subgraph s : result) {
+						if(s.containsTrace(t)) {
+							s.add(t);
+							found = true;
+							break;
+						}
+					}
+					
+					if(!found) {
+						Subgraph s = new Subgraph();
+						s.add(t);
+						result.add(s);
+					}
+					return true;
 				}
-			}
+			});
 		}
-		
 		
 		return result;
 	}
@@ -102,25 +123,22 @@ public class ConnectednessAnalyzer implements IBpmnAnalyzer {
 	}
 
 	private boolean isSometimesEndingInEndEvents(FlowNode start) {
-		List<Trace> traces = start.getNonLoopingTracesToEnd();
-		for(Trace t : traces) {
-			if(t.last().getType().equals("endEvent")) {
-				return true;
+		
+		return !traceStreamer.streamNonLoopingTracesToEnd(start, new MaxTracesReceiver(traceSearchDepth) {
+			@Override
+			public boolean nextTraceImpl(FlowNode start, Trace t) {
+				return !t.last().getType().equals("endEvent");
 			}
-	
-		}
-		return false;
+		});
 	}
 
 	private boolean isAlwaysEndingInEndEvents(FlowNode start) {
-		List<Trace> traces = start.getNonLoopingTracesToEnd();
-		for(Trace t : traces) {
-			if(!t.last().getType().equals("endEvent")) {
-				return false;
+		return traceStreamer.streamNonLoopingTracesToEnd(start, new MaxTracesReceiver(traceSearchDepth) {
+			@Override
+			public boolean nextTraceImpl(FlowNode start, Trace t) {
+				return t.last().getType().equals("endEvent");
 			}
-	
-		}
-		return true;
+		});
 	}
 
 	@Override

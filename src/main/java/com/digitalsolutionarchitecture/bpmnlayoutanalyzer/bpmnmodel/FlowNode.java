@@ -2,11 +2,25 @@ package com.digitalsolutionarchitecture.bpmnlayoutanalyzer.bpmnmodel;
 
 import java.util.ArrayList;
 import java.util.List;
-import java.util.stream.Collectors;
 
 import com.digitalsolutionarchitecture.bpmnlayoutanalyzer.util.StringUtil;
 
 public class FlowNode implements RepresentedByShape {
+
+	@SuppressWarnings("serial")
+	public static class TooManyTraces extends Exception {
+
+		private final List<Trace> result;
+
+		public TooManyTraces(List<Trace> result) {
+			this.result = result;
+		}
+		
+		public List<Trace> getFirstPartOfResult() {
+			return result;
+		}
+
+	}
 
 	private String id;
 	private String type;
@@ -129,39 +143,6 @@ public class FlowNode implements RepresentedByShape {
 		}
 	}
 	
-	public List<Trace> getNonLoopingTracesToEnd() {
-		List<Trace> result = new ArrayList<>();
-		
-		Trace currentTrace = new Trace();
-		getNonLoopingTracesToEnd(result, currentTrace);
-		
-		return result;
-	}
-
-	private void getNonLoopingTracesToEnd(List<Trace> result, Trace currentTrace) {
-		for(FlowNode following : outgoingSequenceFlows.stream().map(x -> x.getTarget()).collect(Collectors.toList())) {
-			if(!currentTrace.contains(following)) {
-				Trace newTrace = new Trace(currentTrace);
-				newTrace.addFlowNodeToTrace(this);
-				following.getNonLoopingTracesToEnd(result, newTrace);
-			}
-		}
-		
-		for(FlowNode fn : getBoundaryEvents()) {
-			if(!currentTrace.contains(fn)) {
-				Trace newTrace = new Trace(currentTrace);
-				newTrace.addFlowNodeToTrace(this);
-				fn.getNonLoopingTracesToEnd(result, newTrace);
-			}
-		}
-		
-		if(outgoingSequenceFlows.size() == 0) {
-			Trace newTrace = new Trace(currentTrace);
-			newTrace.addFlowNodeToTrace(this);
-			result.add(newTrace);
-		}
-	}
-
 	public BpmnProcess getParent() {
 		return parent;
 	}

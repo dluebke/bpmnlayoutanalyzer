@@ -79,4 +79,9 @@ public final class Trace {
 		return true;
 	}
 	
+	@Override
+	public String toString() {
+		return trace.toString();
+	}
+	
 }

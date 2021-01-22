@@ -2,21 +2,20 @@ package com.digitalsolutionarchitecture.bpmnlayoutanalyzer.analyze.layout;
 
 import java.util.Arrays;
 import java.util.List;
-import java.util.Set;
-import java.util.stream.Collectors;
 
 import com.digitalsolutionarchitecture.bpmnlayoutanalyzer.analyze.Result;
 import com.digitalsolutionarchitecture.bpmnlayoutanalyzer.bpmnmodel.BpmnProcess;
+import com.digitalsolutionarchitecture.bpmnlayoutanalyzer.util.CounterMap;
 
 public class LayoutIdenficatorResult extends Result {
 
 	private Layout layout;
-	private Set<Layout> layouts;
+	private String layouts;
 	
-	public LayoutIdenficatorResult(BpmnProcess p, Layout layout, List<SequenceFlowTrace> traces) {
+	public LayoutIdenficatorResult(BpmnProcess p, Layout layout, CounterMap<Layout> traceLayouts) {
 		super(p);
 		this.layout = layout;
-		this.layouts = traces.stream().map(x -> x.getLayout()).collect(Collectors.toSet());
+		this.layouts = traceLayouts.toString();
 	}
 
 	@Override
@@ -28,7 +27,7 @@ public class LayoutIdenficatorResult extends Result {
 		return layout;
 	}
 
-	public Set<Layout> getLayouts() {
+	public String getLayouts() {
 		return layouts;
 	}
 }

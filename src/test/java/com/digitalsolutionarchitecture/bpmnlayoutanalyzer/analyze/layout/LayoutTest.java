@@ -4,7 +4,6 @@ import static org.junit.Assert.assertEquals;
 
 import java.util.Arrays;
 import java.util.Collection;
-import java.util.List;
 
 import org.junit.Test;
 import org.junit.runner.RunWith;
@@ -12,75 +11,59 @@ import org.junit.runners.Parameterized;
 
 import com.digitalsolutionarchitecture.bpmnlayoutanalyzer.analyze.IBpmnAnalyzerTest;
 import com.digitalsolutionarchitecture.bpmnlayoutanalyzer.bpmnmodel.BpmnProcess;
+import com.digitalsolutionarchitecture.bpmnlayoutanalyzer.util.CounterMap;
 
 @RunWith(Parameterized.class)
 public class LayoutTest {
 
 	private LayoutIdentificator layoutIdentificator = new LayoutIdentificator();
 	private String filename;
-	private Layout expectedLayout;
-	private int traceNo;
+	private CounterMap<Layout> expectedLayouts;
 
 	@Parameterized.Parameters(name = "process {0}[{2}] has layout {1}")
 	public static Collection<Object[]> versionCombos() {
 
 		return Arrays.asList(
 //			new Object[] { "", Layout.PURE_LEFT_RIGHT, 0 },
-			new Object[] { "leftright-verticalgateway.bpmn", Layout.LEFT_RIGHT_GATEWAY_VERTICAL_ALLOWED, 0 },
-			new Object[] { "leftright-verticalgateway.bpmn", Layout.LEFT_RIGHT_GATEWAY_VERTICAL_ALLOWED, 1 },
-			new Object[] { "topdown-horizontalgateway.bpmn", Layout.TOP_DOWN_GATEWAY_HORIZONTAL_ALLOWED, 0 },
-			new Object[] { "topdown-horizontalgateway.bpmn", Layout.TOP_DOWN_GATEWAY_HORIZONTAL_ALLOWED, 1 },
-			new Object[] { "dirty-topdown.bpmn", Layout.TOP_DOWN_DIRTY, 0 },
-			new Object[] { "snake-east-2lines.bpmn", Layout.SNAKE_EAST, 0 },
-			new Object[] { "snake-east-3lines.bpmn", Layout.SNAKE_EAST, 0 },
-			new Object[] { "snake-east-4lines.bpmn", Layout.SNAKE_EAST, 0 },
-			new Object[] { "snake-south-2lines.bpmn", Layout.SNAKE_SOUTH, 0 },
-			new Object[] { "snake-south-3lines.bpmn", Layout.SNAKE_SOUTH, 0 },
-			new Object[] { "snake-south-4lines.bpmn", Layout.SNAKE_SOUTH, 0 },
-			new Object[] { "snake-south-5lines.bpmn", Layout.SNAKE_SOUTH, 0 },
-			new Object[] { "chaos.bpmn", Layout.OTHER, 0 },
-			new Object[] { "multiline-east-2lines.bpmn", Layout.MULTILINE_EAST, 0 },
-			new Object[] { "multiline-east-3lines.bpmn", Layout.MULTILINE_EAST, 0 },
-			new Object[] { "multiline-south-2lines.bpmn", Layout.MULTILINE_SOUTH, 0 },
-			new Object[] { "multiline-south-3lines.bpmn", Layout.MULTILINE_SOUTH, 0 },
-			new Object[] { "all-leftupperright.bpmn", Layout.DIAGONAL_NORTH_EAST, 0 },
-			new Object[] { "all-topbottom.bpmn", Layout.TOP_DOWN_PURE, 0 },
-			new Object[] { "eventprocesses-and-subprocesses.bpmn", Layout.LEFT_RIGHT_PURE, 0 },
-			new Object[] { "eventprocesses-and-subprocesses.bpmn", Layout.EVENT_SUBPROCESS, 1 },
-			new Object[] { "eventprocesses-and-subprocesses.bpmn", Layout.EVENT_SUBPROCESS, 2 },
-			new Object[] { "eventprocesses-and-subprocesses.bpmn", Layout.EVENT_SUBPROCESS, 3 },
-			new Object[] { "eventprocesses-and-subprocesses.bpmn", Layout.LEFT_RIGHT_PURE, 4 },
-			new Object[] { "expanded-subprocess.bpmn", Layout.LEFT_RIGHT_PURE, 0 },
-			new Object[] { "expanded-subprocess.bpmn", Layout.LEFT_RIGHT_PURE, 1 },
-			new Object[] { "one-connected-events-multiplestartend.bpmn", Layout.LEFT_RIGHT_PURE, 0 },
-			new Object[] { "one-connected-events-multiplestartend.bpmn", Layout.LEFT_RIGHT_PURE, 1 },
-			new Object[] { "one-connected-events-multiplestartend.bpmn", Layout.LEFT_RIGHT_PURE, 2 },
-			new Object[] { "one-connected-events-multiplestartend.bpmn", Layout.LEFT_RIGHT_PURE, 3 },
-			new Object[] { "simple-xor-loop.bpmn", Layout.LEFT_RIGHT_PURE, 0 },
-			new Object[] { "two-connected-mixedevents-pools.bpmn", Layout.LEFT_RIGHT_PURE, 0 },
-			new Object[] { "two-connected-mixedevents-pools.bpmn", Layout.LEFT_RIGHT_PURE, 1 },
-			new Object[] { "two-connected-mixedevents.bpmn", Layout.LEFT_RIGHT_PURE, 0 },
-			new Object[] { "two-connected-mixedevents.bpmn", Layout.LEFT_RIGHT_PURE, 1 },
-			new Object[] { "two-connected-noevents.bpmn", Layout.LEFT_RIGHT_PURE, 0 },
-			new Object[] { "two-connected-noevents.bpmn", Layout.LEFT_RIGHT_PURE, 1 },
-			new Object[] { "all-leftright.bpmn", Layout.LEFT_RIGHT_PURE, 0 },
-			new Object[] { "all-leftupperright-leftright.bpmn", Layout.LEFT_RIGHT_DIRTY, 0 }
+			new Object[] { "leftright-verticalgateway.bpmn", new CounterMap<Layout>(Layout.LEFT_RIGHT_GATEWAY_VERTICAL_ALLOWED, Layout.LEFT_RIGHT_GATEWAY_VERTICAL_ALLOWED) },
+			new Object[] { "topdown-horizontalgateway.bpmn", new CounterMap<Layout>(Layout.TOP_DOWN_GATEWAY_HORIZONTAL_ALLOWED, Layout.TOP_DOWN_GATEWAY_HORIZONTAL_ALLOWED) },
+			new Object[] { "dirty-topdown.bpmn", new CounterMap<Layout>(Layout.TOP_DOWN_DIRTY) },
+			new Object[] { "snake-east-2lines.bpmn", new CounterMap<Layout>(Layout.SNAKE_EAST) },
+			new Object[] { "snake-east-3lines.bpmn", new CounterMap<Layout>(Layout.SNAKE_EAST) },
+			new Object[] { "snake-east-4lines.bpmn", new CounterMap<Layout>(Layout.SNAKE_EAST) },
+			new Object[] { "snake-south-2lines.bpmn", new CounterMap<Layout>(Layout.SNAKE_SOUTH) },
+			new Object[] { "snake-south-3lines.bpmn", new CounterMap<Layout>(Layout.SNAKE_SOUTH) },
+			new Object[] { "snake-south-4lines.bpmn", new CounterMap<Layout>(Layout.SNAKE_SOUTH) },
+			new Object[] { "snake-south-5lines.bpmn", new CounterMap<Layout>(Layout.SNAKE_SOUTH) },
+			new Object[] { "chaos.bpmn", new CounterMap<Layout>(Layout.OTHER) },
+			new Object[] { "multiline-east-2lines.bpmn", new CounterMap<Layout>(Layout.MULTILINE_EAST) },
+			new Object[] { "multiline-east-3lines.bpmn", new CounterMap<Layout>(Layout.MULTILINE_EAST) },
+			new Object[] { "multiline-south-2lines.bpmn", new CounterMap<Layout>(Layout.MULTILINE_SOUTH) },
+			new Object[] { "multiline-south-3lines.bpmn", new CounterMap<Layout>(Layout.MULTILINE_SOUTH) },
+			new Object[] { "all-leftupperright.bpmn", new CounterMap<Layout>(Layout.DIAGONAL_NORTH_EAST) },
+			new Object[] { "all-topbottom.bpmn", new CounterMap<Layout>(Layout.TOP_DOWN_PURE) },
+			new Object[] { "eventprocesses-and-subprocesses.bpmn", new CounterMap<Layout>(Layout.LEFT_RIGHT_PURE, Layout.EVENT_SUBPROCESS, Layout.EVENT_SUBPROCESS, Layout.EVENT_SUBPROCESS, Layout.LEFT_RIGHT_PURE) },
+			new Object[] { "expanded-subprocess.bpmn", new CounterMap<Layout>(Layout.LEFT_RIGHT_PURE, Layout.LEFT_RIGHT_PURE) },
+			new Object[] { "one-connected-events-multiplestartend.bpmn", new CounterMap<Layout>(Layout.LEFT_RIGHT_PURE, Layout.LEFT_RIGHT_PURE, Layout.LEFT_RIGHT_PURE, Layout.LEFT_RIGHT_PURE) },
+			new Object[] { "simple-xor-loop.bpmn", new CounterMap<Layout>(Layout.LEFT_RIGHT_PURE) },
+			new Object[] { "two-connected-mixedevents-pools.bpmn", new CounterMap<Layout>(Layout.LEFT_RIGHT_PURE, Layout.LEFT_RIGHT_PURE) },
+			new Object[] { "two-connected-mixedevents.bpmn", new CounterMap<Layout>(Layout.LEFT_RIGHT_PURE, Layout.LEFT_RIGHT_PURE) },
+			new Object[] { "two-connected-noevents.bpmn", new CounterMap<Layout>(Layout.LEFT_RIGHT_PURE, Layout.LEFT_RIGHT_PURE) },
+			new Object[] { "all-leftright.bpmn", new CounterMap<Layout>(Layout.LEFT_RIGHT_PURE) },
+			new Object[] { "all-leftupperright-leftright.bpmn", new CounterMap<Layout>(Layout.LEFT_RIGHT_DIRTY) }
 		);
 	}
 
-	public LayoutTest(String filename, Layout expectedLayout, int trace) {
+	public LayoutTest(String filename, CounterMap<Layout> expectedLayouts) {
 	    this.filename = filename;
-	    this.expectedLayout = expectedLayout;
-	    this.traceNo = trace;
+	    this.expectedLayouts = expectedLayouts;
 	}
 	
 	@Test
-	public void testCorrectIdentificationOfLayoutOfTrace() throws Exception {
+	public void testCorrectIdentificationOfLayoutOfTraces() throws Exception {
 		BpmnProcess p = IBpmnAnalyzerTest.readProcess("src/test/resources/" + filename);
-		List<SequenceFlowTrace> traces = layoutIdentificator.extractSequenceFlowTraces(p);
+		CounterMap<Layout> traces = layoutIdentificator.calculateTraceLayouts(p);
 
-		SequenceFlowTrace trace = traces.get(traceNo);
-
-		assertEquals(filename, expectedLayout, Layout.evaluateLayout(trace));
+		assertEquals(traces, expectedLayouts);
 	}
 }

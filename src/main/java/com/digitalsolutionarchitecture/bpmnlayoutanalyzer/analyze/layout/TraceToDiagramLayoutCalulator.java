@@ -1,9 +1,12 @@
 package com.digitalsolutionarchitecture.bpmnlayoutanalyzer.analyze.layout;
 
+import java.util.ArrayList;
 import java.util.List;
 import java.util.Map;
 import java.util.stream.Collectors;
 import java.util.stream.Stream;
+
+import com.digitalsolutionarchitecture.bpmnlayoutanalyzer.util.CounterMap;
 
 public class TraceToDiagramLayoutCalulator {
 
@@ -86,14 +89,15 @@ public class TraceToDiagramLayoutCalulator {
 		  
 		}).collect(Collectors.toMap(data -> (LayoutPair)data[0], data -> (Layout)data[1]));;
 	
-	public Layout calculateDiagramLayout(List<SequenceFlowTrace> traces) {
-		if(traces.isEmpty()) {
+	public Layout calculateDiagramLayout(CounterMap<Layout> traceLayouts) {
+		if(traceLayouts.isEmpty()) {
 			return Layout.EMPTY;
 		}
 		
-		Layout result = traces.get(0).getLayout();
-		for(int i = 1; i < traces.size(); i++) {
-			Layout nextLayout = traces.get(i).getLayout();
+		List<Layout> layouts = new ArrayList<>(traceLayouts.keySet());
+		Layout result = layouts.get(0);
+		for(int i = 1; i < layouts.size(); i++) {
+			Layout nextLayout = layouts.get(i);
 			result = combineLayout(result, nextLayout);
 		}
 		

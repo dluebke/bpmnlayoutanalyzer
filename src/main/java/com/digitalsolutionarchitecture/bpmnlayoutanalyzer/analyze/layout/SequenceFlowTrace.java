@@ -40,4 +40,9 @@ public class SequenceFlowTrace {
 	public String toString() {
 		return sequenceFlows.toString();
 	}
+
+	public void clearFlowNodeData() {
+		sequenceFlows = null;
+		singleFlowNode = null;
+	}
 }

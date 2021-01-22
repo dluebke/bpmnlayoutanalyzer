@@ -15,6 +15,9 @@ import com.digitalsolutionarchitecture.bpmnlayoutanalyzer.bpmnmodel.FlowNode;
 import com.digitalsolutionarchitecture.bpmnlayoutanalyzer.bpmnmodel.SequenceFlow;
 import com.digitalsolutionarchitecture.bpmnlayoutanalyzer.bpmnmodel.Trace;
 import com.digitalsolutionarchitecture.bpmnlayoutanalyzer.bpmnmodel.WayPoint;
+import com.digitalsolutionarchitecture.bpmnlayoutanalyzer.bpmnmodel.helper.MaxTracesReceiver;
+import com.digitalsolutionarchitecture.bpmnlayoutanalyzer.bpmnmodel.helper.TraceStreamer;
+import com.digitalsolutionarchitecture.bpmnlayoutanalyzer.util.CounterMap;
 
 public class LayoutIdentificator implements IBpmnAnalyzer {
 
@@ -25,38 +28,52 @@ public class LayoutIdentificator implements IBpmnAnalyzer {
 	private EdgeWaypointOptimizer edgeWaypointOptimizer = new EdgeWaypointOptimizer();
 	private SequenceFlowForwardBackwardClassifier sequenceFlowClassifier = new SequenceFlowForwardBackwardClassifier();
 	private TraceToDiagramLayoutCalulator traceToDiagramLayoutCalulator = new TraceToDiagramLayoutCalulator();
+	private TraceStreamer traceStreamer = new TraceStreamer();
+
+	private int traceSearchDepth;
+
+	public LayoutIdentificator() {
+		this(1000000);
+	}
 	
+	public LayoutIdentificator(int traceSearchDepth) {
+		this.traceSearchDepth = traceSearchDepth;
+	}
+
 	@Override
 	public void analyze(BpmnProcess p) {
-		List<SequenceFlowTrace> traces = extractSequenceFlowTraces(p);
-		evaluateLayoutForTraces(traces);
+		CounterMap<Layout> traceLayouts = calculateTraceLayouts(p);
 		results.add(new LayoutIdenficatorResult(
 			p, 
-			traceToDiagramLayoutCalulator.calculateDiagramLayout(traces),
-			traces
+			traceToDiagramLayoutCalulator.calculateDiagramLayout(traceLayouts),
+			traceLayouts
 		));
 	}
 
-	void evaluateLayoutForTraces(List<SequenceFlowTrace> traces) {
-		for(SequenceFlowTrace t : traces) {
-			t.setLayout(Layout.evaluateLayout(t));
-		}
-	}
-
-	List<SequenceFlowTrace> extractSequenceFlowTraces(BpmnProcess p) {
-		List<SequenceFlowTrace> result = new ArrayList<>();
+	CounterMap<Layout> calculateTraceLayouts(BpmnProcess p) {
+		CounterMap<Layout> result = new CounterMap<>();
 		Map<SequenceFlow, DirectionType> directions = sequenceFlowClassifier.evaluateDirection(p);
 		
 		for(FlowNode start : p.getStartFlowNodes()) {
-			for(Trace t : start.getNonLoopingTracesToEnd()) {
-				if(t.hasCompleteLayoutData()) {
-					if(t.getFlowNodes().size() > 1) {
-						result.add(convertToSequenceFlowTrace(t, directions));
-					} else {
-						result.add(new SequenceFlowTrace(t.getFlowNodes().get(0)));
+			traceStreamer.streamNonLoopingTracesToEnd(start, new MaxTracesReceiver(traceSearchDepth) {
+				
+				@Override
+				public boolean nextTraceImpl(FlowNode start, Trace t) {
+					if(t.hasCompleteLayoutData()) {
+						SequenceFlowTrace st;
+						if(t.getFlowNodes().size() > 1) {
+							st = convertToSequenceFlowTrace(t, directions);
+						} else {
+							st = new SequenceFlowTrace(t.getFlowNodes().get(0));
+						}
+						Layout layout = Layout.evaluateLayout(st);
+//						st.setLayout(layout);
+//						st.clearFlowNodeData(); // make sure to save memory
+						result.inc(layout);
 					}
+					return true;
 				}
-			}
+			});
 		}
 		
 		return result;

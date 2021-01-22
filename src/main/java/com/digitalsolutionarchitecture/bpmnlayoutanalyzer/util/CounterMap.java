@@ -9,6 +9,17 @@ public class CounterMap<K> {
 	
 	private final Map<K, Integer> store = new HashMap<>();
 	
+	public CounterMap() {
+	}
+	
+	@SafeVarargs
+	public CounterMap(K... keys) {
+		this();
+		for(K key : keys) {
+			inc(key);
+		}
+	}
+
 	public int inc(K key) {
 		int newValue = get(key) + 1;
 		store.put(key, newValue);
@@ -74,5 +85,17 @@ public class CounterMap<K> {
 		}
 		
 		return ((CounterMap<?>)other).store.equals(store);
+	}
+
+	public boolean isEmpty() {
+		return store.isEmpty();
+	}
+
+	public int size() {
+		return store.size();
+	}
+
+	public boolean containsKey(K key) {
+		return store.containsKey(key);
 	}
 }

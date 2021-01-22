@@ -28,6 +28,8 @@ import com.digitalsolutionarchitecture.bpmnlayoutanalyzer.output.CsvWriterOption
 
 public class BpmnLayoutAnalyzer {
 
+	private static final int MAX_TRACE_SEARCH_DEPTH = 10000000;
+	
 	private IBpmnAnalyzer[] analyzers = new IBpmnAnalyzer[] {
 			new SequenceFlowDirectionSummaryAnalyzer(),
 			new DiagramDimensionAnalyzer(),
@@ -35,9 +37,9 @@ public class BpmnLayoutAnalyzer {
 			new SequenceFlowReporter(),
 			new ControlFlowPatternAnalyzer(),
 			new FlowNodeCountAnalyzer(),
-			new ConnectednessAnalyzer(),
+			new ConnectednessAnalyzer(MAX_TRACE_SEARCH_DEPTH),
 			new AllFlowNodeTypesAnalyzer(),
-			new LayoutIdentificator()
+			new LayoutIdentificator(MAX_TRACE_SEARCH_DEPTH)
 	};
 
 	private ExporterEstimator exporterEstimator = new ExporterEstimator();
