@@ -1,8 +1,11 @@
-package com.digitalsolutionarchitecture.bpmnlayoutanalyzer.analyze.layout;
+package com.digitalsolutionarchitecture.bpmnlayoutanalyzer.analyze.layouttrace;
 
 import static org.junit.Assert.*;
 
 import org.junit.Test;
+
+import com.digitalsolutionarchitecture.bpmnlayoutanalyzer.analyze.layouttrace.Layout;
+import com.digitalsolutionarchitecture.bpmnlayoutanalyzer.analyze.layouttrace.TraceToDiagramLayoutCalulator;
 
 public class TraceToDiagramLayoutCalulatorTest {
 

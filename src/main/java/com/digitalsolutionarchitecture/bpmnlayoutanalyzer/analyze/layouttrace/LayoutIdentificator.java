@@ -1,4 +1,4 @@
-package com.digitalsolutionarchitecture.bpmnlayoutanalyzer.analyze.layout;
+package com.digitalsolutionarchitecture.bpmnlayoutanalyzer.analyze.layouttrace;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -15,8 +15,8 @@ import com.digitalsolutionarchitecture.bpmnlayoutanalyzer.bpmnmodel.FlowNode;
 import com.digitalsolutionarchitecture.bpmnlayoutanalyzer.bpmnmodel.SequenceFlow;
 import com.digitalsolutionarchitecture.bpmnlayoutanalyzer.bpmnmodel.Trace;
 import com.digitalsolutionarchitecture.bpmnlayoutanalyzer.bpmnmodel.WayPoint;
-import com.digitalsolutionarchitecture.bpmnlayoutanalyzer.bpmnmodel.helper.MaxTracesReceiver;
-import com.digitalsolutionarchitecture.bpmnlayoutanalyzer.bpmnmodel.helper.TraceStreamer;
+import com.digitalsolutionarchitecture.bpmnlayoutanalyzer.bpmnmodel.helper.trace.MaxTracesReceiver;
+import com.digitalsolutionarchitecture.bpmnlayoutanalyzer.bpmnmodel.helper.trace.TraceStreamer;
 import com.digitalsolutionarchitecture.bpmnlayoutanalyzer.util.CounterMap;
 
 public class LayoutIdentificator implements IBpmnAnalyzer {

@@ -1,4 +1,4 @@
-package com.digitalsolutionarchitecture.bpmnlayoutanalyzer.analyze.connectedness;
+package com.digitalsolutionarchitecture.bpmnlayoutanalyzer.bpmnmodel.helper.subgraph;
 
 import java.util.HashSet;
 import java.util.List;

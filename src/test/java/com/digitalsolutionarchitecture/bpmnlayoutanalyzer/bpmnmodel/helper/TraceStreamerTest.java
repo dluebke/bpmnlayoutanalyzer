@@ -13,6 +13,8 @@ import com.digitalsolutionarchitecture.bpmnlayoutanalyzer.analyze.IBpmnAnalyzerT
 import com.digitalsolutionarchitecture.bpmnlayoutanalyzer.bpmnmodel.BpmnProcess;
 import com.digitalsolutionarchitecture.bpmnlayoutanalyzer.bpmnmodel.FlowNode;
 import com.digitalsolutionarchitecture.bpmnlayoutanalyzer.bpmnmodel.Trace;
+import com.digitalsolutionarchitecture.bpmnlayoutanalyzer.bpmnmodel.helper.trace.ITraceReceiver;
+import com.digitalsolutionarchitecture.bpmnlayoutanalyzer.bpmnmodel.helper.trace.TraceStreamer;
 
 public class TraceStreamerTest {
 

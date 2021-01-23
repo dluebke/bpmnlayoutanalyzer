@@ -1,4 +1,4 @@
-package com.digitalsolutionarchitecture.bpmnlayoutanalyzer.analyze.layout;
+package com.digitalsolutionarchitecture.bpmnlayoutanalyzer.analyze.layouttrace;
 
 import static org.junit.Assert.*;
 
@@ -8,6 +8,9 @@ import org.junit.Ignore;
 import org.junit.Test;
 
 import com.digitalsolutionarchitecture.bpmnlayoutanalyzer.analyze.IBpmnAnalyzerTest;
+import com.digitalsolutionarchitecture.bpmnlayoutanalyzer.analyze.layouttrace.Layout;
+import com.digitalsolutionarchitecture.bpmnlayoutanalyzer.analyze.layouttrace.LayoutIdenficatorResult;
+import com.digitalsolutionarchitecture.bpmnlayoutanalyzer.analyze.layouttrace.LayoutIdentificator;
 import com.digitalsolutionarchitecture.bpmnlayoutanalyzer.bpmnmodel.BpmnProcess;
 import com.digitalsolutionarchitecture.bpmnlayoutanalyzer.bpmnmodel.FlowNode;
 

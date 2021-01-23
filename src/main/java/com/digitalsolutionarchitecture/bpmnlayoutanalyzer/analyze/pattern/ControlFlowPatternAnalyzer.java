@@ -46,9 +46,6 @@ public class ControlFlowPatternAnalyzer implements IBpmnAnalyzer {
 	}
 
 	private void identifyEventBasedGateways(FlowNode fn, BpmnProcess processWithDiagramData) {
-		if(processWithDiagramData.getFilename().endsWith("SequenceFlow_Visibility.bpmn")) {
-			System.out.println("Found");
-		}
 		if("eventBasedGateway".equals(fn.getType())) {
 			List<String> outgoingFlowNodes = fn.getOutgoingSequenceFlows().stream()
 					.map(x -> x.getTarget())

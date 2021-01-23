@@ -4,6 +4,9 @@ import java.io.File;
 import java.io.FileInputStream;
 import java.io.IOException;
 import java.io.InputStream;
+import java.util.HashMap;
+import java.util.Map;
+import java.util.Map.Entry;
 
 import javax.xml.parsers.ParserConfigurationException;
 import javax.xml.xpath.XPathExpressionException;
@@ -16,7 +19,7 @@ import com.digitalsolutionarchitecture.bpmnlayoutanalyzer.analyze.edges.Sequence
 import com.digitalsolutionarchitecture.bpmnlayoutanalyzer.analyze.edges.SequenceFlowReporter;
 import com.digitalsolutionarchitecture.bpmnlayoutanalyzer.analyze.exporter.ExporterEstimator;
 import com.digitalsolutionarchitecture.bpmnlayoutanalyzer.analyze.flownodecount.FlowNodeCountAnalyzer;
-import com.digitalsolutionarchitecture.bpmnlayoutanalyzer.analyze.layout.LayoutIdentificator;
+import com.digitalsolutionarchitecture.bpmnlayoutanalyzer.analyze.layouttrace.LayoutIdentificator;
 import com.digitalsolutionarchitecture.bpmnlayoutanalyzer.analyze.pattern.ControlFlowPatternAnalyzer;
 import com.digitalsolutionarchitecture.bpmnlayoutanalyzer.analyze.pools.PoolOrientationEvaluator;
 import com.digitalsolutionarchitecture.bpmnlayoutanalyzer.bpmnmodel.BpmnProcess;
@@ -28,7 +31,7 @@ import com.digitalsolutionarchitecture.bpmnlayoutanalyzer.output.CsvWriterOption
 
 public class BpmnLayoutAnalyzer {
 
-	private static final int MAX_TRACE_SEARCH_DEPTH = 10000000;
+	private static final int MAX_TRACE_SEARCH_DEPTH = 10000;
 	
 	private IBpmnAnalyzer[] analyzers = new IBpmnAnalyzer[] {
 			new SequenceFlowDirectionSummaryAnalyzer(),
@@ -41,6 +44,7 @@ public class BpmnLayoutAnalyzer {
 			new AllFlowNodeTypesAnalyzer(),
 			new LayoutIdentificator(MAX_TRACE_SEARCH_DEPTH)
 	};
+	private Map<IBpmnAnalyzer,Long> timeSpentInNanosOnAnalyzer = new HashMap<>();
 
 	private ExporterEstimator exporterEstimator = new ExporterEstimator();
 	private BpmnLayoutSetter bpmnLayoutSetter = new BpmnLayoutSetter();
@@ -67,7 +71,11 @@ public class BpmnLayoutAnalyzer {
 	private void analyzeDiagram(BpmnProcess process, int diagramIndex) {
 		bpmnLayoutSetter.setLayoutData(process, diagramIndex);
 		for(IBpmnAnalyzer a : analyzers) {
+			long start = System.nanoTime();
 			a.analyze(process);
+			long timeSpent = System.nanoTime() - start;
+			timeSpent += timeSpentInNanosOnAnalyzer.getOrDefault(a, 0l);
+			timeSpentInNanosOnAnalyzer.put(a, timeSpent);
 		}
 	}	
 	
@@ -77,6 +85,10 @@ public class BpmnLayoutAnalyzer {
 				out.writeHeader(a.getHeaders());
 				out.writeRecords(a.getResults());
 			}
+		}
+		
+		for(Entry<IBpmnAnalyzer, Long> stat : timeSpentInNanosOnAnalyzer.entrySet()) {
+			System.out.println(stat.getKey().getShortName() + ": " + stat.getValue() + "ns");
 		}
 	}
 

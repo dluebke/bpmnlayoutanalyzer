@@ -1,4 +1,4 @@
-package com.digitalsolutionarchitecture.bpmnlayoutanalyzer.analyze.layout;
+package com.digitalsolutionarchitecture.bpmnlayoutanalyzer.analyze.layouttrace;
 
 import java.util.Arrays;
 import java.util.List;

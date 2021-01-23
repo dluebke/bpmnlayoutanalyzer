@@ -1,4 +1,4 @@
-package com.digitalsolutionarchitecture.bpmnlayoutanalyzer.bpmnmodel.helper;
+package com.digitalsolutionarchitecture.bpmnlayoutanalyzer.bpmnmodel.helper.trace;
 
 import java.util.ArrayList;
 import java.util.List;

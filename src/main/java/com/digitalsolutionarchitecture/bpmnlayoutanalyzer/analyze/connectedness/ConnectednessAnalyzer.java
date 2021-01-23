@@ -9,18 +9,19 @@ import java.util.stream.Collectors;
 import com.digitalsolutionarchitecture.bpmnlayoutanalyzer.analyze.IBpmnAnalyzer;
 import com.digitalsolutionarchitecture.bpmnlayoutanalyzer.bpmnmodel.BpmnProcess;
 import com.digitalsolutionarchitecture.bpmnlayoutanalyzer.bpmnmodel.FlowNode;
-import com.digitalsolutionarchitecture.bpmnlayoutanalyzer.bpmnmodel.SequenceFlow;
+import com.digitalsolutionarchitecture.bpmnlayoutanalyzer.bpmnmodel.helper.subgraph.Subgraph;
+import com.digitalsolutionarchitecture.bpmnlayoutanalyzer.bpmnmodel.helper.subgraph.SubgraphCalculator;
 
 public class ConnectednessAnalyzer implements IBpmnAnalyzer {
 
 	private List<ConnectednessAnalyzerResult> results = new ArrayList<>();
-
+	private SubgraphCalculator subgraphCalculator = new SubgraphCalculator();
+	
 	@Override
 	public void analyze(BpmnProcess processWithDiagramData) {
 		
 		List<FlowNode> startFlowNodes = processWithDiagramData.getStartFlowNodes();
-		List<Subgraph> subgraphs = calculateSubgraphs(startFlowNodes, processWithDiagramData);
-		Set<FlowNode> endFlowNodes = calculateEndFlowNodes(subgraphs);
+		List<Subgraph> subgraphs = subgraphCalculator.calculateSubgraphs(startFlowNodes, processWithDiagramData);
 		Connectedness connectedness = subgraphs.size() == 1 ? Connectedness.SINGLE_PROCESS : Connectedness.MULTIPLE_PROCESSES;
 
 		Set<StartAndEndConstellation> startAndEnds = calculateStartAndEndConstellations(subgraphs);
@@ -28,7 +29,7 @@ public class ConnectednessAnalyzer implements IBpmnAnalyzer {
 			startAndEnds.contains(StartAndEndConstellation.INCORRECT) ? StartAndEndConstellation.INCORRECT : StartAndEndConstellation.SOMETIMES_EVENTS_SOMETIMES_NOEVENTS;
 		
 		int startFlowNodeCount = startFlowNodes.size();
-		int endFlowNodeCount = endFlowNodes.size();
+		int endFlowNodeCount = calculateEndFlowNodes(subgraphs).size();
 		int subgraphCount = subgraphs.size();
 		
 		String[] startFlowNodeIds = startFlowNodes.stream().map(x -> x.getId()).collect(Collectors.toList()).toArray(new String[0]);
@@ -53,40 +54,7 @@ public class ConnectednessAnalyzer implements IBpmnAnalyzer {
 		return result;
 	}
 
-	private List<Subgraph> calculateSubgraphs(List<FlowNode> startFlowNodes, BpmnProcess p) {
-		final List<Subgraph> result = new ArrayList<>();
-		List<FlowNode> starts = new ArrayList<>(startFlowNodes);
-		
-		while(starts.size() > 0) {
-			Subgraph currentSubgraph = new Subgraph();
-			result.add(currentSubgraph);
-			
-			List<FlowNode> elementsToProcess = new ArrayList<>();
-			elementsToProcess.add(starts.get(starts.size() - 1));
-			
-			while(!elementsToProcess.isEmpty()) {
-				FlowNode currentElement = elementsToProcess.remove(elementsToProcess.size() - 1);
-				starts.remove(currentElement);
-				currentSubgraph.add(currentElement);
-				currentSubgraph.addAll(currentElement.getBoundaryEvents());
-				
-				for(SequenceFlow sf : currentElement.getIncomingSequenceFlows()) {
-					FlowNode possibleNextNode = sf.getSource();
-					if(!currentSubgraph.contains(possibleNextNode) && !elementsToProcess.contains(possibleNextNode)) {
-						elementsToProcess.add(possibleNextNode);
-					}
-				}
-				for(SequenceFlow sf : currentElement.getOutgoingSequenceFlows()) {
-					FlowNode possibleNextNode = sf.getTarget();
-					if(!currentSubgraph.contains(possibleNextNode) && !elementsToProcess.contains(possibleNextNode)) {
-						elementsToProcess.add(possibleNextNode);
-					}
-				}
-			}
-		}
-		
-		return result;
-	}
+	
 
 	private Set<StartAndEndConstellation> calculateStartAndEndConstellations(List<Subgraph> subgraphs) {
 		Set<StartAndEndConstellation> startAndEnds = new HashSet<>();

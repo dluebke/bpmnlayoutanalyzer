@@ -174,7 +174,7 @@ public class BpmnReader {
 			}
 			FlowNode target = process.getFlowNodeById(targetId);
 			if(target == null) {
-				throw new InvalidBpmnXml("Flow Node not found: " + targetId + " (for targetin sequence flow " + sequenceFlowId + ")");
+				throw new InvalidBpmnXml("Flow Node not found: " + targetId + " (for target in sequence flow " + sequenceFlowId + ")");
 			}
 			
 			SequenceFlow s = new SequenceFlow(sequenceFlowId, source, target);
